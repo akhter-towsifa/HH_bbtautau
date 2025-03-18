@@ -46,7 +46,7 @@ channelSelection:
     - eMu
     - muMu
 
-met_type: "PFMET"
+met_type: "PuppiMET"
 deepTauVersion: 2p5
 region: SR
 region_default: SR
@@ -131,21 +131,21 @@ channelDefinition:
 triggers:
   eTau: [ singleEle, etau]
   muTau: [singleMu, mutau]
-  tauTau: [ditau, ditauJet]
+  tauTau: [ditau]#, ditaujet]
   eE: [singleEle]
   eMu: [singleEle, singleMu]
   muMu: [singleMu]
 
 hist_triggers:
   eTau:
-    default: ( ( (HLT_singleEle || HLT_etau ) && Legacy_region ) || (HLT_singleTau && SingleTau_region && !Legacy_region)  || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ))
+    default: ( ( (HLT_singleEle || HLT_etau ) && Legacy_region ) ) #|| (HLT_singleTau && SingleTau_region && !Legacy_region)  || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ))
     Run2_2016 :  ( ( (HLT_singleEle && SingleEle_region) || (HLT_singleTau && SingleTau_region && !Legacy_region) || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) )))
     Run2_2016_HIPM :  ( ( (HLT_singleEle && SingleEle_region) || (HLT_singleTau && SingleTau_region && !Legacy_region) || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) )))
   muTau:
-    default: (( (HLT_singleMu || HLT_mutau ) && Legacy_region ) || (HLT_singleTau && SingleTau_region && !Legacy_region)  || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ))
+    default: (( (HLT_singleMu || HLT_mutau ) && Legacy_region ) ) #|| (HLT_singleTau && SingleTau_region && !Legacy_region)  || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ))
   tauTau:
-    default: ( ( (HLT_ditau || HLT_ditauJet) && Legacy_Region ) || (HLT_MET && !(Legacy_Region) ) )
-    # default: ((HLT_ditau && Legacy_region) || (HLT_singleTau && SingleTau_region && !Legacy_region)  || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ) )
+    # default: ( ( (HLT_ditau || HLT_ditaujet) && Legacy_Region ) ) # || (HLT_MET && !(Legacy_Region) ) )
+    default: ((HLT_ditau && Legacy_region) || (HLT_singleTau && SingleTau_region && !Legacy_region)  || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ) )
   eE:
     default: (HLT_singleEle && SingleEle_region)
   eMu:
@@ -165,7 +165,7 @@ application_regions:
   SingleEle_region: ((tau1_pt > {ele_th}  && abs(tau1_eta) < 2.5) || (tau2_pt > {ele_th}  && abs(tau2_eta) < 2.5))
   CrossEleTau_region: (tau1_pt > 25 && abs(tau1_eta) < 2.1 && tau2_pt > 35 && abs(tau2_eta) < 2.1)
   diTau_region: (tau1_pt > 40 && abs(tau1_eta) < 2.1 && tau2_pt > 40 && abs(tau2_eta) < 2.1)
-  diTauJet_region: (tau1_pt > 35 && abs(tau1_eta) < 2.1 && tau2_pt > 35 && abs(tau2_eta) < 2.1 && v_ops::pt(Jet_p4)>60)
+  diTauJet_region: (tau1_pt > 35 && abs(tau1_eta) < 2.1 && tau2_pt > 35 && abs(tau2_eta) < 2.1 ) #&& Jet_pt>60)
   SingleTau_region: (((tau1_pt > {tau_th} && abs(tau1_eta) < 2.1) || (tau2_pt > {tau_th} && abs(tau2_eta) < 2.1)) )
   #MET_region: (!(Legacy_region) && !(SingleTau_region))
 
@@ -193,7 +193,7 @@ category_definition:
 
 
   # w/ mass window
-  boosted_baseline: "(SelectedFatJet_p4[fatJet_sel].size()>0)"
+  # boosted_baseline: "(SelectedFatJet_p4[fatJet_sel].size()>0)" (commenting this out because it has been defined under w/o mass window already)
   inclusive_masswindow:  "!(boosted_baseline) && {region}"
   btag_shape_masswindow:  "!(boosted_baseline) && {region}"
   baseline_masswindow: "return {region};"

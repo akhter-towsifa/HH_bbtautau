@@ -12,25 +12,25 @@ ditau:
         cut: TrigObj_id==15 && (TrigObj_filterBits&8)!=0 && (TrigObj_filterBits&2048)!=0
       doMatching: True
 
-ditauJet:
-  channels:
-    - tauTau
-  path:
-    - HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet60
-    # - HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet75 #this is the backup path of the previous one JIRA: https://its.cern.ch/jira/browse/CMSHLT-2620
-  legs:
-    - offline_obj:
-        type: Tau
-        cut: v_ops::pt(Tau_p4) > 35 && abs(v_ops::eta(Tau_p4)) < 2.1
-      online_obj:
-        cut: TrigObj_id==15 && (TrigObj_filterBits&8)!=0 && (TrigObj_filterBits&2048)!=0 & (TrigObj_filterBits&16384)!=0
-      doMatching: True
-    - offline_obj:
-        type: Jet
-        cut: v_ops::pt(Jet_p4) > 60
-      online_obj:
-        cut: TrigObj_id==1 && (TrigObj_filterBits&131072)!=0
-      doMatching: True
+# ditaujet:
+#   channels:
+#     - tauTau
+#   path:
+#     - HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet60
+#     # - HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet75 #this is the backup path of the previous one JIRA: https://its.cern.ch/jira/browse/CMSHLT-2620
+#   legs:
+#     - offline_obj:
+#         type: Tau
+#         cut: v_ops::pt(Tau_p4) > 35 && abs(v_ops::eta(Tau_p4)) < 2.1
+#       online_obj:
+#         cut: TrigObj_id==15 && (TrigObj_filterBits&8)!=0 && (TrigObj_filterBits&2048)!=0 & (TrigObj_filterBits&16384)!=0
+#       doMatching: True
+#     - offline_obj:
+#         type: Jet
+#         cut: v_ops::pt(Jet_p4) > 60
+#       online_obj:
+#         cut: TrigObj_id==1 && (TrigObj_filterBits&131072)!=0
+#       doMatching: True
 
 mutau:
   channels:
