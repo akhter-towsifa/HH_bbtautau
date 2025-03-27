@@ -8,4 +8,6 @@ norm:
   MuonID_TightIDIso:
     expression: weight_tau1_MuonID_SF_LoosePFIso{scale}_rel * weight_tau2_MuonID_SF_LoosePFIso{scale}_rel * final_weight
     name: MuonID_TightIDIso
+  HLT_singleMu:
+    expression: weight_tau1_TrgSF_singleMu_IsoMu24{scale}_rel * final_weight
 shape: []

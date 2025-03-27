@@ -133,7 +133,7 @@ triggers:
   muTau: [singleMu, mutau]
   tauTau: [ditau]#, ditaujet]
   eE: [singleEle]
-  eMu: [singleEle, singleMu]
+  eMu: [singleMu]
   muMu: [singleMu]
 
 hist_triggers:
@@ -149,7 +149,7 @@ hist_triggers:
   eE:
     default: (HLT_singleEle && SingleEle_region)
   eMu:
-    default: ((HLT_singleEle && SingleEle_region) || (HLT_singleMu && SingleMu_region))
+    default: (HLT_singleMu && SingleMu_region)) #((HLT_singleEle && SingleEle_region) || (HLT_singleMu && SingleMu_region))
   muMu:
     default: (HLT_singleMu && SingleMu_region)
 
