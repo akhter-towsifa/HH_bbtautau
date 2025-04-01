@@ -7,6 +7,15 @@ from FLAF.Analysis.GetCrossWeights import *
 # from Analysis.GetTauTauWeights import *
 from FLAF.Common.Utilities import *
 
+def workingPoints(global_cfg_dict):
+    from Corrections.Corrections import Corrections
+    from Corrections.btag import bTagCorrProducer
+    print(global_cfg_dict)
+    Corrections.initializeGlobal(global_cfg_dict, sample_name=None, isData=False, load_corr_lib=True)
+    if 'btag' in Corrections.getGlobal().to_apply:
+        wp_value = bTagCorrProducer.getWPValues
+    print('workingPoints')
+
 def createKeyFilterDict(global_cfg_dict, year):
     reg_dict = {}
     filter_str = ""
@@ -46,31 +55,35 @@ def GetBTagWeight(global_cfg_dict,cat,applyBtag=False):
 
 
 def GetWeight(channel, cat, boosted_categories):
-    weights_to_apply = ["weight_MC_Lumi_pu", "weight_L1PreFiring_Central"]#,"weight_L1PreFiring_ECAL_Central", "weight_L1PreFiring_Muon_Central"]
+    weights_to_apply = ["weight_MC_Lumi_pu"]#, "weight_L1PreFiring_Central","weight_L1PreFiring_ECAL_Central", "weight_L1PreFiring_Muon_Central"]
     trg_weights_dict = {
-        'eTau':["weight_HLT_eTau", "weight_HLT_singleTau", "weight_HLT_MET"],
-        'muTau':["weight_HLT_muTau", "weight_HLT_singleTau", "weight_HLT_MET"],
-        'tauTau':["weight_HLT_diTau", "weight_HLT_diTauJet", "weight_HLT_singleTau", "weight_HLT_MET"],
+        'eTau':["weight_HLT_singleEle"],#["weight_HLT_eTau", "weight_HLT_singleTau", "weight_HLT_MET"],
+        'muTau':["weight_HLT_singleMu"],#["weight_HLT_muTau", "weight_HLT_singleTau", "weight_HLT_MET"],
+        'tauTau':["weight_HLT_diTau"],#["weight_HLT_diTau", "weight_HLT_diTauJet", "weight_HLT_singleTau", "weight_HLT_MET"],
         'eE':["weight_HLT_singleEle"],
         'muMu':["weight_HLT_singleMu"],
-        'eMu':["weight_HLT_eMu"]
+        'eMu':["weight_HLT_singleMu"]#["weight_HLT_eMu"]
     }
     ID_weights_dict = {
         'eTau': ["weight_tau1_EleSF_wp80iso_EleIDCentral", "weight_tau2_TauID_SF_Medium_Central"], # theorically
-        'muTau': ["weight_tau1_HighPt_MuonID_SF_RecoCentral", "weight_tau1_HighPt_MuonID_SF_TightIDCentral", "weight_tau1_MuonID_SF_RecoCentral", "weight_tau1_MuonID_SF_TightID_TrkCentral", "weight_tau1_MuonID_SF_TightRelIsoCentral","weight_tau2_TauID_SF_Medium_Central"],
+        # 'muTau': ["weight_tau1_HighPt_MuonID_SF_RecoCentral", "weight_tau1_HighPt_MuonID_SF_TightIDCentral", "weight_tau1_MuonID_SF_RecoCentral", "weight_tau1_MuonID_SF_TightID_TrkCentral", "weight_tau1_MuonID_SF_TightRelIsoCentral","weight_tau2_TauID_SF_Medium_Central"],
+        'muTau': ["weight_tau1_HighPt_MuonID_SF_RecoCentral", "weight_tau1_HighPt_MuonID_SF_TightIDCentral", "weight_tau1_MuonID_SF_TightID_TrkCentral","weight_tau2_TauID_SF_Medium_Central"],
         'tauTau': ["weight_tau1_TauID_SF_Medium_Central", "weight_tau2_TauID_SF_Medium_Central"],
-        'muMu': ["weight_tau1_HighPt_MuonID_SF_RecoCentral", "weight_tau1_HighPt_MuonID_SF_TightIDCentral", "weight_tau1_MuonID_SF_RecoCentral", "weight_tau1_MuonID_SF_TightID_TrkCentral", "weight_tau1_MuonID_SF_TightRelIsoCentral", "weight_tau2_HighPt_MuonID_SF_RecoCentral", "weight_tau2_HighPt_MuonID_SF_TightIDCentral", "weight_tau2_MuonID_SF_RecoCentral", "weight_tau2_MuonID_SF_TightID_TrkCentral", "weight_tau2_MuonID_SF_TightRelIsoCentral"],
-        'eMu': ["weight_tau1_EleSF_wp80iso_EleIDCentral","weight_tau2_HighPt_MuonID_SF_RecoCentral", "weight_tau2_HighPt_MuonID_SF_TightIDCentral", "weight_tau2_MuonID_SF_RecoCentral", "weight_tau2_MuonID_SF_TightID_TrkCentral", "weight_tau2_MuonID_SF_TightRelIsoCentral"],
+        # 'muMu': ["weight_tau1_HighPt_MuonID_SF_RecoCentral", "weight_tau1_HighPt_MuonID_SF_TightIDCentral", "weight_tau1_MuonID_SF_RecoCentral", "weight_tau1_MuonID_SF_TightID_TrkCentral", "weight_tau1_MuonID_SF_TightRelIsoCentral", "weight_tau2_HighPt_MuonID_SF_RecoCentral", "weight_tau2_HighPt_MuonID_SF_TightIDCentral", "weight_tau2_MuonID_SF_RecoCentral", "weight_tau2_MuonID_SF_TightID_TrkCentral", "weight_tau2_MuonID_SF_TightRelIsoCentral"],
+        'muMu': ["weight_tau1_HighPt_MuonID_SF_RecoCentral", "weight_tau1_HighPt_MuonID_SF_TightIDCentral", "weight_tau1_MuonID_SF_TightID_TrkCentral", "weight_tau2_HighPt_MuonID_SF_RecoCentral", "weight_tau2_HighPt_MuonID_SF_TightIDCentral", "weight_tau2_MuonID_SF_TightID_TrkCentral"],
+        'eMu': ["weight_tau1_EleSF_wp80iso_EleIDCentral","weight_tau2_HighPt_MuonID_SF_RecoCentral", "weight_tau2_HighPt_MuonID_SF_TightIDCentral", "weight_tau2_MuonID_SF_TightID_TrkCentral"],
+        #'eMu': ["weight_tau1_EleSF_wp80iso_EleIDCentral","weight_tau2_HighPt_MuonID_SF_RecoCentral", "weight_tau2_HighPt_MuonID_SF_TightIDCentral", "weight_tau2_MuonID_SF_RecoCentral", "weight_tau2_MuonID_SF_TightID_TrkCentral", "weight_tau2_MuonID_SF_TightRelIsoCentral"],
         #'eMu': ["weight_tau1_MuonID_SF_RecoCentral","weight_tau1_HighPt_MuonID_SF_RecoCentral","weight_tau1_MuonID_SF_TightID_TrkCentral","weight_tau1_MuonID_SF_TightRelIsoCentral","weight_tau2_EleSF_wp80iso_EleIDCentral"]
         'eE':["weight_tau1_EleSF_wp80iso_EleIDCentral","weight_tau2_EleSF_wp80noiso_EleIDCentral"]
         }
 
     weights_to_apply.extend(ID_weights_dict[channel])
     weights_to_apply.extend(trg_weights_dict[channel])
-    if cat not in boosted_categories:
-         weights_to_apply.extend(["weight_Jet_PUJetID_Central_b1_2", "weight_Jet_PUJetID_Central_b2_2"])
-    else:
-        weights_to_apply.extend(["weight_pNet_Central"])
+    # if cat not in boosted_categories:
+    #     weights_to_apply.extend(["weight_Jet_PUJetID_Central_b1_2", "weight_Jet_PUJetID_Central_b2_2"])
+    # else:
+    #     weights_to_apply.extend(["weight_pNet_Central"])
+    weights_to_apply.extend(["weight_pNet_Central"])
     total_weight = '*'.join(weights_to_apply)
     return total_weight
 
@@ -127,8 +140,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         singleTau_th_dict = self.config['singleTau_th']
         singleMu_th_dict = self.config['singleMu_th']
         singleEle_th_dict = self.config['singleEle_th']
-        legacy_region_definition= "( ( eTau && (SingleEle_region  || CrossEleTau_region) ) || ( muTau && (SingleMu_region  || CrossMuTau_region) ) || ( tauTau && ( diTau_region || diTauJet_region) ) || ( eE && (SingleEle_region)) || (eMu && ( SingleEle_region || SingleMu_region ) ) || (muMu && (SingleMu_region)) )"
-        #legacy_region_definition= "( ( eTau && (SingleEle_region ) ) || ( muTau && (SingleMu_region ) ) || ( tauTau && ( diTau_region ) ) || ( eE && (SingleEle_region)) || (eMu && ( SingleEle_region || SingleMu_region ) ) || (muMu && (SingleMu_region)) )" # if not including xtrgs
+        # legacy_region_definition= "( ( eTau && (SingleEle_region  || CrossEleTau_region) ) || ( muTau && (SingleMu_region  || CrossMuTau_region) ) || ( tauTau && ( diTau_region || diTauJet_region) ) || ( eE && (SingleEle_region)) || (eMu && ( SingleEle_region || SingleMu_region ) ) || (muMu && (SingleMu_region)) )"
+        legacy_region_definition= "( ( eTau && (SingleEle_region ) ) || ( muTau && (SingleMu_region ) ) || ( tauTau && ( diTau_region ) ) || ( eE && (SingleEle_region)) || (eMu && ( SingleMu_region ) ) || (muMu && (SingleMu_region)) )" # if not including xtrgs
         for reg_name, reg_exp in self.config['application_regions'].items():
             self.df = self.df.Define(reg_name, reg_exp.format(tau_th=singleTau_th_dict[self.period], ele_th=singleEle_th_dict[self.period], mu_th=singleMu_th_dict[self.period]))
         self.df = self.df.Define("Legacy_region", legacy_region_definition)
@@ -262,15 +275,16 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
     def __init__(self, df, config, period, deepTauVersion='v2p1', bTagWPString = "Medium", pNetWPstring="Loose", region="SR",isData=False, isCentral=False, wantTriggerSFErrors=False, whichType=3, wantScales=True):
         super(DataFrameBuilderForHistograms, self).__init__(df)
-        self.deepTauVersion = deepTauVersion
+        self.deepTauVersion = config["deepTauVersion"]
+        print(f' ana {self.deepTauVersion}')
         self.config = config
-        self.bTagWPString = bTagWPString
-        self.pNetWPstring = pNetWPstring
-        self.pNetWP = WorkingPointsParticleNet[period][pNetWPstring]
-        self.bTagWP = WorkingPointsDeepFlav[period][bTagWPString]
         self.period = period
         self.region = region
         self.isData = isData
+        self.bTagWPString = bTagWPString
+        self.pNetWPstring = pNetWPstring
+        self.pNetWP = 0.5 #WorkingPointsParticleNet[period][pNetWPstring]
+        self.bTagWP = 0.5 #workingPoints(self.config) #WorkingPointsDeepFlav[period][bTagWPString]
         self.whichType = whichType
         self.isCentral = isCentral
         self.wantTriggerSFErrors = wantTriggerSFErrors
@@ -295,8 +309,8 @@ def PrepareDfForHistograms(dfForHistograms):
     if not dfForHistograms.isData:
         dfForHistograms.definePNetSFs()
         defineTriggerWeights(dfForHistograms)
-        if dfForHistograms.wantTriggerSFErrors and dfForHistograms.isCentral:
-            defineTriggerWeightsErrors(dfForHistograms)
+        # if dfForHistograms.wantTriggerSFErrors and dfForHistograms.isCentral:
+        #     defineTriggerWeightsErrors(dfForHistograms)
     dfForHistograms.defineCRs()
     dfForHistograms.defineCategories()
     dfForHistograms.defineQCDRegions()
