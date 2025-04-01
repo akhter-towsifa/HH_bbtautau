@@ -276,15 +276,14 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
     def __init__(self, df, config, period, deepTauVersion='v2p1', bTagWPString = "Medium", pNetWPstring="Loose", region="SR",isData=False, isCentral=False, wantTriggerSFErrors=False, whichType=3, wantScales=True):
         super(DataFrameBuilderForHistograms, self).__init__(df)
         self.deepTauVersion = config["deepTauVersion"]
-        print(f' ana {self.deepTauVersion}')
         self.config = config
         self.period = period
         self.region = region
         self.isData = isData
         self.bTagWPString = bTagWPString
         self.pNetWPstring = pNetWPstring
-        self.pNetWP = 0.5 #WorkingPointsParticleNet[period][pNetWPstring]
-        self.bTagWP = 0.5 #workingPoints(self.config) #WorkingPointsDeepFlav[period][bTagWPString]
+        self.pNetWP = 0.3086 #temporary placeholder from btag wp json file #WorkingPointsParticleNet[period][pNetWPstring]
+        self.bTagWP = 0.047 #temporary placeholder from btag wp json file #workingPoints(self.config) #WorkingPointsDeepFlav[period][bTagWPString]
         self.whichType = whichType
         self.isCentral = isCentral
         self.wantTriggerSFErrors = wantTriggerSFErrors
