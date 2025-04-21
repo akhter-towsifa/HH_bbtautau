@@ -23,6 +23,11 @@
     - VV
   title: "VV"
   color: kOrange-4
+- name: W
+  types:
+   - W
+  title: "W #rightarrow l#nu + jets"
+  color: kOrange+1
 - name: single_H
   title: "H"
   types:
@@ -34,38 +39,39 @@
   title: "Other"
   types: []
   color: kPink+2
-- name: GluGluToBulkGraviton_1250
-  title: "GGBG-1250"
+- name: GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00
+  title: "GGtoHHto2B2Tau"
   type: signal
   types:
-   - GluGluToBulkGraviton
+    - HHnonRes
   color: kCyan
-  #scale: 0.05
-- name: GluGluToRadion_1250
-  title: "GGR-1250"
-  type: signal
-  types:
-   - GluGluToRadion
-  color: kRed
-- name: GluGluToRadion_700
-  title: "GGR-700"
-  type: signal
-  types:
-   - GluGluToRadion
-  color: kYellow
-- name: GluGluToRadion_450
-  title: "GGR-450"
-  type: signal
-  types:
-   - GluGluToRadion
-  color: kGreen+2
+# - name: GluGluToBulkGraviton_1250
+#   title: "GGBG-1250"
+#   type: signal
+#   types:
+#    - GluGluToBulkGraviton
+#   color: kCyan
+#   #scale: 0.05
+# - name: GluGluToRadion_1250
+#   title: "GGR-1250"
+#   type: signal
+#   types:
+#    - GluGluToRadion
+#   color: kRed
+# - name: GluGluToRadion_700
+#   title: "GGR-700"
+#   type: signal
+#   types:
+#    - GluGluToRadion
+#   color: kYellow
+# - name: GluGluToRadion_450
+#   title: "GGR-450"
+#   type: signal
+#   types:
+#    - GluGluToRadion
+#   color: kGreen+2
 - name: data
   title: "data obs"
   types:
     - data
   type: data
-#- name: W
-  #types:
-  #  - W
-  #title: "W #rightarrow l#nu + jets"
-  #color: kYellow-7

@@ -1,11 +1,11 @@
 import os
 
-era = "Run3_2022"
-ver = "initial_test"
-indir = f"/eos/user/t/toakhter/HH_bbtautau_Run3/histograms/{ver}/{era}/merged/"
+era = "ERA_string"
+ver = "your_version"
+indir = f"/eos/user/u/username/HH_bbtautau_Run3/histograms/{ver}/{era}/merged/"
 plotdir = f"/eos/user/t/toakhter/HH_bbtautau_Run3/histograms/{ver}/{era}/plots/"
 
-varnames = ["tau1_pt", "tau2_pt", "b1_pt", "b2_pt", "tautau_m_vis", "bb_m_vis", "bbtautau_mass", "MT2"] 
+varnames = ["tau1_pt", "tau2_pt", "b1_pt", "b2_pt", "tautau_m_vis", "bb_m_vis", "MT2"] #"bbtautau_mass"
 
 channellist = ["eE", "eMu", "muMu", "eTau", "muTau", "tauTau"]
 
@@ -21,8 +21,8 @@ for var in varnames:
         outname = os.path.join(plotdir, f"HHbbtautau_{channel}_{var}_StackPlot.pdf")
 
         if not using_uncertainties:
-            os.system(f"python3 ../FLAF/Analysis/HistPlotter.py --inFile {filename} --bckgConfig ../config/background_samples.yaml --globalConfig ../config/global.yaml --outFile {outname} --var {var} --category {cat} --channel {channel} --uncSource Central --wantData --year {era} --wantQCD False --rebin False --analysis HH_bbtautau --qcdregion OS_Iso --sigConfig ../config/{era}/samples.yaml")
+            os.system(f"python3 ../FLAF/Analysis/HistPlotter.py --inFile {filename} --bckgConfig ../config/background_samples.yaml --globalConfig ../config/global.yaml --outFile {outname} --var {var} --category {cat} --channel {channel} --uncSource Central --wantData --year {era} --wantQCD False --rebin False --analysis HH_bbtautau --qcdregion OS_Iso --sigConfig ../config/{era}/samples.yaml --wantSignals")
 
         else:
             filename = os.path.join(indir, var, 'tmp', f"all_histograms_{var}_hadded.root")
-            os.system(f"python3 ../FLAF/Analysis/HistPlotter.py --inFile {filename} --bckgConfig ../config/background_samples.yaml --globalConfig ../config/global.yaml --outFile {outname} --var {var} --category {cat} --channel {channel} --uncSource Central --wantData --year {era} --wantQCD False --rebin False --analysis HH_bbtautau --qcdregion OS_Iso --sigConfig ../config/{era}/samples.yaml")
+            os.system(f"python3 ../FLAF/Analysis/HistPlotter.py --inFile {filename} --bckgConfig ../config/background_samples.yaml --globalConfig ../config/global.yaml --outFile {outname} --var {var} --category {cat} --channel {channel} --uncSource Central --wantData --year {era} --wantQCD False --rebin False --analysis HH_bbtautau --qcdregion OS_Iso --sigConfig ../config/{era}/samples.yaml --wantSignals")

@@ -97,14 +97,14 @@ ST_tW_top_LNu2Q:
   sampleType: ST
 
 ############## TTX inclusive ##############
-TTWW:
-  sampleType: TTVV
-TTWH:
-  sampleType: TTVV
-TTZH:
-  sampleType: TTVV
-TTZZ:
-  sampleType: TTVV
+# TTWW:
+#   sampleType: TTVV
+# TTWH:
+#   sampleType: TTVV
+# TTZH:
+#   sampleType: TTVV
+# TTZZ:
+#   sampleType: TTVV
 
 ############## ttH ##############
 ttHToNonbb_M125:

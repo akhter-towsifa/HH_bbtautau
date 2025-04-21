@@ -10,4 +10,8 @@ norm:
     name: MuonID_TightIDIso
   HLT_singleMu:
     expression: weight_tau1_TrgSF_singleMu_IsoMu24{scale}_rel * final_weight
+    name: HLT_singleMu
+  HLT_singleEle:
+    expression: weight_tau1_TrgSF_singleEle_singleEle{scale}_rel * final_weight
+    name: HLT_singleEle
 shape: []

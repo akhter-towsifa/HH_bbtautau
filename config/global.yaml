@@ -138,18 +138,18 @@ triggers:
 
 hist_triggers:
   eTau:
-    default: ( ( (HLT_singleEle || HLT_etau ) && Legacy_region ) ) #|| (HLT_singleTau && SingleTau_region && !Legacy_region)  || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ))
+    default: ( HLT_singleEle && Legacy_region ) #( ( (HLT_singleEle || HLT_etau ) && Legacy_region ) || (HLT_singleTau && SingleTau_region && !Legacy_region) || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ))
     Run2_2016 :  ( ( (HLT_singleEle && SingleEle_region) || (HLT_singleTau && SingleTau_region && !Legacy_region) || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) )))
     Run2_2016_HIPM :  ( ( (HLT_singleEle && SingleEle_region) || (HLT_singleTau && SingleTau_region && !Legacy_region) || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) )))
   muTau:
-    default: (( (HLT_singleMu || HLT_mutau ) && Legacy_region ) ) #|| (HLT_singleTau && SingleTau_region && !Legacy_region)  || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ))
+    default: (HLT_singleMu && Legacy_region) #(( (HLT_singleMu || HLT_mutau ) && Legacy_region ) || (HLT_singleTau && SingleTau_region && !Legacy_region) || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ))
   tauTau:
     # default: ( ( (HLT_ditau || HLT_ditaujet) && Legacy_Region ) ) # || (HLT_MET && !(Legacy_Region) ) )
-    default: ((HLT_ditau && Legacy_region) || (HLT_singleTau && SingleTau_region && !Legacy_region)  || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ) )
+    default: (HLT_ditau && Legacy_region) #((HLT_ditau && Legacy_region) || (HLT_singleTau && SingleTau_region && !Legacy_region) || (HLT_MET && (!(Legacy_region) && !(SingleTau_region)) ) )
   eE:
     default: (HLT_singleEle && SingleEle_region)
   eMu:
-    default: (HLT_singleMu && SingleMu_region)) #((HLT_singleEle && SingleEle_region) || (HLT_singleMu && SingleMu_region))
+    default: (HLT_singleMu && SingleMu_region) #((HLT_singleEle && SingleEle_region) || (HLT_singleMu && SingleMu_region))
   muMu:
     default: (HLT_singleMu && SingleMu_region)
 
@@ -172,7 +172,7 @@ application_regions:
 category_definition:
   # w/o mass window
 
-  boosted_baseline: "(SelectedFatJet_p4[fatJet_sel].size()>0)"
+  # boosted_baseline: "(SelectedFatJet_p4[fatJet_sel].size()>0)"
   inclusive:  "!(boosted_baseline)"
   btag_shape: "!(boosted_baseline)"
   baseline: "return true;"
