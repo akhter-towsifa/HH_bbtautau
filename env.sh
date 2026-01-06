@@ -20,3 +20,4 @@ action() {
 action "$@"
 unset -f apply_cmssw_customization_steps
 unset -f action
+ulimit -n 2048
