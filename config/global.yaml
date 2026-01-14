@@ -59,17 +59,20 @@ corrections:
 variables:
   - tau1_pt
   - tau1_eta
+  - tau1_phi
   - tau2_pt
   - tau2_eta
-  - b1_pt
-  - b1_eta
-  - b2_pt
-  - b2_eta
+  - tau2_phi
   - tautau_m_vis
-  - bb_m_vis
   - met_pt
-  - nBJets
-  - nJet
+  - bbtautau_mass
+  - dR_tautau
+  - pt_ll
+  - deltaPhi_metnomu_tau1
+  - deltaPhi_metnomu_tau2
+  - deltaPhi_met_tau1
+  - deltaPhi_met_tau2
+
 
 treeName: "Events"
 
