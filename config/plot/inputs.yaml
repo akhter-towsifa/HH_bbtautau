@@ -25,7 +25,7 @@
   color: kOrange-4
 - name: W
   types:
-   - W
+    - W
   title: "W #rightarrow l#nu + jets"
   color: kOrange+1
 - name: single_H

@@ -1,4 +1,4 @@
-#https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTrigger#Updates_for_2022_data_taking
+# https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauTrigger#Updates_for_2022_data_taking
 vbf: # to check kinematic cuts for offline objs and trigger bits for online objs
   channels:
     - tauTau
@@ -11,18 +11,18 @@ vbf: # to check kinematic cuts for offline objs and trigger bits for online objs
         cut: TrigObj_id==15 && (TrigObj_filterBits&8)!=0 && (TrigObj_filterBits&1024)!=0
       dRMatching: 0.4
       doMatching: True
-      jsonTRGcorrection_key: {'2022_Summer22': '', 
-                            '2022_Summer22EE': '',
-                            }
+      jsonTRGcorrection_key:
+        2022_Summer22: ''
+        2022_Summer22EE: ''
       jsonTRGcorrection_elepath: "placeholder"
-    - offline_obj: 
+    - offline_obj:
         cut: "{obj}_legType == Leg::jet && {obj}_pt > 60"
       online_obj:
         cut: TrigObj_id==1 && (TrigObj_filterBits&262144)!=0
       doMatching: True
-      jsonTRGcorrection_key: {'2022_Summer22': 'jetlegSFs', 
-                              '2022_Summer22EE': 'jetlegSFs',
-                             }
+      jsonTRGcorrection_key:
+        2022_Summer22: jetlegSFs
+        2022_Summer22EE: jetlegSFs
       jsonTRGcorrection_elepath: "placeholder"
 
 ditau:
@@ -37,10 +37,10 @@ ditau:
         cut: TrigObj_id==15 && (TrigObj_filterBits&8)!=0 && (TrigObj_filterBits&2048)!=0
       dRMatching: 0.4
       doMatching: True
-      jsonTRGcorrection_key: {'2022_Summer22': 'tau_trigger', 
-                            '2022_Summer22EE': 'tau_trigger',
-                            }
-      jsonTRGcorrection_elepath: "placeholder" 
+      jsonTRGcorrection_key:
+        2022_Summer22: tau_trigger
+        2022_Summer22EE: tau_trigger
+      jsonTRGcorrection_elepath: "placeholder"
 
 ditaujet:
   channels:
@@ -53,18 +53,18 @@ ditaujet:
       online_obj:
         cut: TrigObj_id==15 && (TrigObj_filterBits&8)!=0 && (TrigObj_filterBits&2048)!=0 & (TrigObj_filterBits&16384)!=0
       doMatching: True
-      jsonTRGcorrection_key: {'2022_Summer22': 'tau_trigger', 
-                            '2022_Summer22EE': 'tau_trigger',
-                            }
+      jsonTRGcorrection_key:
+        2022_Summer22: tau_trigger
+        2022_Summer22EE: tau_trigger
       jsonTRGcorrection_elepath: "placeholder"
     - offline_obj:
         cut: "{obj}_legType == Leg::jet && {obj}_pt > 60"
       online_obj:
         cut: TrigObj_id==1 && (TrigObj_filterBits&131072)!=0
       doMatching: True
-      jsonTRGcorrection_key: {'2022_Summer22': 'jetlegSFs', 
-                            '2022_Summer22EE': 'jetlegSFs',
-                            }
+      jsonTRGcorrection_key:
+        2022_Summer22: jetlegSFs
+        2022_Summer22EE: jetlegSFs
       jsonTRGcorrection_elepath: "placeholder"
 
 mutau:
@@ -76,20 +76,20 @@ mutau:
     - offline_obj:
         cut: "{obj}_legType == Leg::mu && {obj}_pt > 22 && abs({obj}_eta) < 2.1"
       online_obj:
-        cut: TrigObj_id==13 && (TrigObj_filterBits&64)!=0 #&& TrigObj_pt>20
+        cut: TrigObj_id==13 && (TrigObj_filterBits&64)!=0 # && TrigObj_pt>20
       doMatching: True
-      jsonTRGcorrection_key: {"2022_Summer22":"NUM_IsoMu20_DEN_CutBasedIdTight_and_PFIsoTight_{}eff", 
-                              "2022_Summer22EE":"NUM_IsoMu20_DEN_CutBasedIdTight_and_PFIsoTight_{}eff",
-                            }
+      jsonTRGcorrection_key:
+        2022_Summer22: "NUM_IsoMu20_DEN_CutBasedIdTight_and_PFIsoTight_{}eff"
+        2022_Summer22EE: "NUM_IsoMu20_DEN_CutBasedIdTight_and_PFIsoTight_{}eff"
       jsonTRGcorrection_elepath: "placeholder"
     - offline_obj:
         cut: "{obj}_legType == Leg::tau && {obj}_pt > 32 && abs({obj}_eta) < 2.1"
       online_obj:
         cut: TrigObj_id==15 && (TrigObj_filterBits&8)!=0  && (TrigObj_filterBits&8192)!=0
       doMatching: True
-      jsonTRGcorrection_key: {"2022_Summer22":"tau_trigger", 
-                              "2022_Summer22EE":"tau_trigger",
-                            }
+      jsonTRGcorrection_key:
+        2022_Summer22: tau_trigger
+        2022_Summer22EE: tau_trigger
       jsonTRGcorrection_elepath: "placeholder"
 
 etau:
@@ -101,20 +101,20 @@ etau:
     - offline_obj:
         cut: "{obj}_legType == Leg::e && {obj}_pt > 26 && abs({obj}_eta) < 2.1"
       online_obj:
-        cut: TrigObj_id==11 && (TrigObj_filterBits&128)!=0 #&& TrigObj_pt>24
+        cut: TrigObj_id==11 && (TrigObj_filterBits&128)!=0 # && TrigObj_pt>24
       doMatching: True
-      jsonTRGcorrection_key: {"2022_Summer22":"Electron-HLT-{}Eff", 
-                              "2022_Summer22EE":"Electron-HLT-{}Eff",
-                              }
+      jsonTRGcorrection_key:
+        2022_Summer22: "Electron-HLT-{}Eff"
+        2022_Summer22EE: "Electron-HLT-{}Eff"
       jsonTRGcorrection_elepath: "HLT_SF_Ele24_TightID"
     - offline_obj:
         cut: "{obj}_legType == Leg::tau && {obj}_pt > 35 && abs({obj}_eta) < 2.1"
       online_obj:
-        cut:  TrigObj_id==15 && (TrigObj_filterBits&8)!=0 && (TrigObj_filterBits&4096)!=0
+        cut: TrigObj_id==15 && (TrigObj_filterBits&8)!=0 && (TrigObj_filterBits&4096)!=0
       doMatching: True
-      jsonTRGcorrection_key: {"2022_Summer22":"tau_trigger", 
-                              "2022_Summer22EE":"tau_trigger",
-                            }
+      jsonTRGcorrection_key:
+        2022_Summer22: tau_trigger
+        2022_Summer22EE: tau_trigger
       jsonTRGcorrection_elepath: "placeholder"
 
 singleMu:
@@ -126,13 +126,13 @@ singleMu:
     - HLT_IsoMu24
   legs:
     - offline_obj:
-        cut:  "{obj}_legType == Leg::mu && {obj}_pt > 26"# {obj}_pt > 26 && abs({obj}_eta) < 2.4
+        cut: "{obj}_legType == Leg::mu && {obj}_pt > 26" # {obj}_pt > 26 && abs({obj}_eta) < 2.4
       online_obj:
         cut: TrigObj_id == 13 && (TrigObj_filterBits&8)!=0
       doMatching: True
-      jsonTRGcorrection_key: {"2022_Summer22":"NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_{}eff", 
-                              "2022_Summer22EE":"NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_{}eff",
-                            }
+      jsonTRGcorrection_key:
+        2022_Summer22: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_{}eff
+        2022_Summer22EE: NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_{}eff
       jsonTRGcorrection_elepath: "placeholder"
 
 singleEle:
@@ -144,13 +144,13 @@ singleEle:
     - HLT_Ele30_WPTight_Gsf
   legs:
     - offline_obj:
-        cut: "{obj}_legType == Leg::e && {obj}_pt > 32"# {obj}_pt > 32 && abs({obj}_eta) < 2.4
+        cut: "{obj}_legType == Leg::e && {obj}_pt > 32" # {obj}_pt > 32 && abs({obj}_eta) < 2.4
       online_obj:
         cut: TrigObj_id == 11 && (TrigObj_filterBits&2)!=0
       doMatching: True
-      jsonTRGcorrection_key: {"2022_Summer22":"Electron-HLT-{}Eff", 
-                              "2022_Summer22EE":"Electron-HLT-{}Eff",
-                            }
+      jsonTRGcorrection_key:
+        2022_Summer22: "Electron-HLT-{}Eff"
+        2022_Summer22EE: "Electron-HLT-{}Eff"
       jsonTRGcorrection_elepath: "HLT_SF_Ele30_TightID"
 
 ####################################

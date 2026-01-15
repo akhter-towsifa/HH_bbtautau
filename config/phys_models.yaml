@@ -1,0 +1,19 @@
+BaseModel:
+  name: "Base Model"
+  backgrounds:
+    - TT
+    - ttH
+    - ggH
+    - VBFH
+    - VH
+    - ST
+    - DY
+    - WtoLNu
+    - VV
+    - VVV
+
+  signals:
+    - GluGlutoHHto2B2Tau
+    - VBFHHto2B2Tau
+  data:
+    - Data

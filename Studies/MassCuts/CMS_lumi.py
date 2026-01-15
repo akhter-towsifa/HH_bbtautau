@@ -24,26 +24,32 @@ lumiTextFont = 42  # Font for "CMS"
 lumi_13TeV = "138.8 fb^{-1} (13 TeV)"
 lumi_sqrtS = ""
 period_dict = {
-    "Run2_2018" : "59.83 fb^{-1} (13 TeV)",
-    "Run2_2017" : "41.48 fb^{-1} (13 TeV)",
-    "Run2_2016" : "16.8 fb^{-1} (13 TeV)",
-    "Run2_2016_H" : "19.5 fb^{-1} (13 TeV)",
+    "Run2_2018": "59.83 fb^{-1} (13 TeV)",
+    "Run2_2017": "41.48 fb^{-1} (13 TeV)",
+    "Run2_2016": "16.8 fb^{-1} (13 TeV)",
+    "Run2_2016_H": "19.5 fb^{-1} (13 TeV)",
     "all": "138.8 fb^{-1} (13 TeV)",
-
 }
+
 
 def CMS_lumi(pad, iPeriod, iPosX):
     """Function to add CMS text and luminosity to the plot."""
     outOfFrame = False
-    if(iPosX // 10 == 0): outOfFrame = True
+    if iPosX // 10 == 0:
+        outOfFrame = True
 
     alignY_ = 3
     alignX_ = 2
-    if(iPosX // 10 == 0): alignX_ = 1
-    if(iPosX == 0): alignY_ = 1
-    if(iPosX // 10 == 1): alignX_ = 1
-    if(iPosX // 10 == 2): alignX_ = 2
-    if(iPosX // 10 == 3): alignX_ = 3
+    if iPosX // 10 == 0:
+        alignX_ = 1
+    if iPosX == 0:
+        alignY_ = 1
+    if iPosX // 10 == 1:
+        alignX_ = 1
+    if iPosX // 10 == 2:
+        alignX_ = 2
+    if iPosX // 10 == 3:
+        alignX_ = 3
     align_ = 10 * alignX_ + alignY_
 
     H = pad.GetWh()
@@ -66,13 +72,15 @@ def CMS_lumi(pad, iPeriod, iPosX):
     latex.SetTextSize(lumiTextSize * topMargin)
 
     # Draw luminosity text on the right
-    latex.DrawLatex(1 - rightMargin, 1 - topMargin + lumiTextOffset * topMargin, lumiText)
+    latex.DrawLatex(
+        1 - rightMargin, 1 - topMargin + lumiTextOffset * topMargin, lumiText
+    )
 
     pad.cd()
 
-    posX_ = leftMargin + relPosX*leftMargin # CMS text on the left
-    posY_ = 1 - relPosY #+ cmsTextOffset
-    #posY_ = 1 - 0.4*topMargin
+    posX_ = leftMargin + relPosX * leftMargin  # CMS text on the left
+    posY_ = 1 - relPosY  # + cmsTextOffset
+    # posY_ = 1 - 0.4*topMargin
 
     # Draw the CMS text on the left
     latex.SetTextFont(cmsTextFont)
@@ -81,10 +89,10 @@ def CMS_lumi(pad, iPeriod, iPosX):
     latex.DrawLatex(posX_, posY_, cmsText)
 
     # Draw extra text below CMS (e.g., "Preliminary")
-    if(writeExtraText):
+    if writeExtraText:
         latex.SetTextFont(extraTextFont)
         latex.SetTextAlign(13)
-        latex.SetTextSize(extraTextSize*topMargin)
-        latex.DrawLatex(posX_+relExtraDX*leftMargin, posY_, extraText)
+        latex.SetTextSize(extraTextSize * topMargin)
+        latex.DrawLatex(posX_ + relExtraDX * leftMargin, posY_, extraText)
 
     pad.Update()

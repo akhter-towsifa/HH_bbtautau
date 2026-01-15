@@ -3,7 +3,7 @@
 	url = git@github.com:cms-flaf/FLAF.git
 [submodule "HHbtag"]
 	path = HHbtag
-	url = ssh://git@gitlab.cern.ch:7999/hh/bbtautau/hh-btag.git
+	url = git@github.com:elviramartinv/HHbtag.git
 [submodule "Corrections"]
 	path = Corrections
 	url = git@github.com:cms-flaf/Corrections.git

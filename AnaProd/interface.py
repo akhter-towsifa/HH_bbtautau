@@ -48,7 +48,7 @@ def rotate_to_phi(
     The rotated px and py components are returned in a 2-tuple.
     """
     new_phi = np.arctan2(py, px) - ref_phi
-    pt = (px**2 + py**2)**0.5
+    pt = (px**2 + py**2) ** 0.5
     return pt * np.cos(new_phi), pt * np.sin(new_phi)
 
 
@@ -62,14 +62,46 @@ class NNInterface(object):
         "event_number",
         # int32
         "pair_type",  # 0: mutau, 1: etau, 2: tautau
-        "dau1_dm", "dau2_dm", "dau1_charge", "dau2_charge", "is_boosted", "has_bjet_pair",
+        "dau1_dm",
+        "dau2_dm",
+        "dau1_charge",
+        "dau2_charge",
+        "is_boosted",
+        "has_bjet_pair",
         # float32
-        "met_px", "met_py", "met_cov00", "met_cov01", "met_cov11",
-        "dau1_e", "dau1_px", "dau1_py", "dau1_pz",
-        "dau2_e", "dau2_px", "dau2_py", "dau2_pz",
-        "bjet1_e", "bjet1_px", "bjet1_py", "bjet1_pz", "bjet1_btag_df", "bjet1_cvsb", "bjet1_cvsl", "bjet1_hhbtag",
-        "bjet2_e", "bjet2_px", "bjet2_py", "bjet2_pz", "bjet2_btag_df", "bjet2_cvsb", "bjet2_cvsl", "bjet2_hhbtag",
-        "fatjet_e", "fatjet_px", "fatjet_py", "fatjet_pz",
+        "met_px",
+        "met_py",
+        "met_cov00",
+        "met_cov01",
+        "met_cov11",
+        "dau1_e",
+        "dau1_px",
+        "dau1_py",
+        "dau1_pz",
+        "dau2_e",
+        "dau2_px",
+        "dau2_py",
+        "dau2_pz",
+        "bjet1_e",
+        "bjet1_px",
+        "bjet1_py",
+        "bjet1_pz",
+        "bjet1_btag_df",
+        "bjet1_cvsb",
+        "bjet1_cvsl",
+        "bjet1_hhbtag",
+        "bjet2_e",
+        "bjet2_px",
+        "bjet2_py",
+        "bjet2_pz",
+        "bjet2_btag_df",
+        "bjet2_cvsb",
+        "bjet2_cvsl",
+        "bjet2_hhbtag",
+        "fatjet_e",
+        "fatjet_px",
+        "fatjet_py",
+        "fatjet_pz",
     ]
 
     def __init__(self, fold_index: int, model_path: str) -> None:
@@ -92,7 +124,9 @@ class NNInterface(object):
         mass: float,
         era: Era,  # a single value, assuming that the predict() is not called in parallel over multuple eras
         # features are defined in the array_inputs list
-        **features: dict[str, npt.NDArray[np.int64] | npt.NDArray[np.int32] | npt.NDArray[np.float32]],
+        **features: dict[
+            str, npt.NDArray[np.int64] | npt.NDArray[np.int32] | npt.NDArray[np.float32]
+        ],
     ) -> npt.NDArray[np.float32]:
         # shorthand for features
         f = DotDict(features)
@@ -143,41 +177,103 @@ class NNInterface(object):
 
         # mask bjet-related features when there was actually no bjet pair
         bj_mask = f.has_bjet_pair != 1
-        f.bjet1_e[bj_mask] = f.bjet1_px[bj_mask] = f.bjet1_py[bj_mask] = f.bjet1_pz[bj_mask] = 0.0  # noqa
-        f.bjet2_e[bj_mask] = f.bjet2_px[bj_mask] = f.bjet2_py[bj_mask] = f.bjet2_pz[bj_mask] = 0.0  # noqa
+        f.bjet1_e[bj_mask] = f.bjet1_px[bj_mask] = f.bjet1_py[bj_mask] = f.bjet1_pz[
+            bj_mask
+        ] = 0.0  # noqa
+        f.bjet2_e[bj_mask] = f.bjet2_px[bj_mask] = f.bjet2_py[bj_mask] = f.bjet2_pz[
+            bj_mask
+        ] = 0.0  # noqa
         f.bjet1_btag_df[bj_mask] = f.bjet1_cvsb[bj_mask] = f.bjet1_cvsl[bj_mask] = -1.0
         f.bjet2_btag_df[bj_mask] = f.bjet2_cvsb[bj_mask] = f.bjet2_cvsl[bj_mask] = -1.0
-        f.hbb_e[bj_mask] = f.hbb_px[bj_mask] = f.hbb_py[bj_mask] = f.hbb_pz[bj_mask] = 0.0  # noqa
-        f.htthbb_e[bj_mask] = f.htthbb_px[bj_mask] = f.htthbb_py[bj_mask] = f.htthbb_pz[bj_mask] = 0.0  # noqa
+        f.hbb_e[bj_mask] = f.hbb_px[bj_mask] = f.hbb_py[bj_mask] = f.hbb_pz[bj_mask] = (
+            0.0  # noqa
+        )
+        f.htthbb_e[bj_mask] = f.htthbb_px[bj_mask] = f.htthbb_py[bj_mask] = f.htthbb_pz[
+            bj_mask
+        ] = 0.0  # noqa
 
         # mask fatjet features when there was actually no fatjet
         fj_mask = f.is_boosted != 1
-        f.fatjet_e[fj_mask] = f.fatjet_px[fj_mask] = f.fatjet_py[fj_mask] = f.fatjet_pz[fj_mask] = 0.0  # noqa
+        f.fatjet_e[fj_mask] = f.fatjet_px[fj_mask] = f.fatjet_py[fj_mask] = f.fatjet_pz[
+            fj_mask
+        ] = 0.0  # noqa
 
         # build input tensors
         cont_ones = np.ones_like(f.met_px)
         cont_inputs = tf.concat(
-            [t[..., None] for t in [
-                f.met_px, f.met_py, f.met_cov00, f.met_cov01, f.met_cov11,
-                f.dau1_px, f.dau1_py, f.dau1_pz, f.dau1_e,
-                f.dau2_px, f.dau2_py, f.dau2_pz, f.dau2_e,
-                f.bjet1_px, f.bjet1_py, f.bjet1_pz, f.bjet1_e, f.bjet1_btag_df, f.bjet1_cvsb, f.bjet1_cvsl, f.bjet1_hhbtag,  # noqa
-                f.bjet2_px, f.bjet2_py, f.bjet2_pz, f.bjet2_e, f.bjet2_btag_df, f.bjet2_cvsb, f.bjet2_cvsl, f.bjet2_hhbtag,  # noqa
-                f.fatjet_px, f.fatjet_py, f.fatjet_pz, f.fatjet_e,
-                f.htt_e, f.htt_px, f.htt_py, f.htt_pz,
-                f.hbb_e, f.hbb_px, f.hbb_py, f.hbb_pz,
-                f.htthbb_e, f.htthbb_px, f.htthbb_py, f.htthbb_pz,
-                f.httfatjet_e, f.httfatjet_px, f.httfatjet_py, f.httfatjet_pz,
-                cont_ones * mass,
-            ]],
+            [
+                t[..., None]
+                for t in [
+                    f.met_px,
+                    f.met_py,
+                    f.met_cov00,
+                    f.met_cov01,
+                    f.met_cov11,
+                    f.dau1_px,
+                    f.dau1_py,
+                    f.dau1_pz,
+                    f.dau1_e,
+                    f.dau2_px,
+                    f.dau2_py,
+                    f.dau2_pz,
+                    f.dau2_e,
+                    f.bjet1_px,
+                    f.bjet1_py,
+                    f.bjet1_pz,
+                    f.bjet1_e,
+                    f.bjet1_btag_df,
+                    f.bjet1_cvsb,
+                    f.bjet1_cvsl,
+                    f.bjet1_hhbtag,  # noqa
+                    f.bjet2_px,
+                    f.bjet2_py,
+                    f.bjet2_pz,
+                    f.bjet2_e,
+                    f.bjet2_btag_df,
+                    f.bjet2_cvsb,
+                    f.bjet2_cvsl,
+                    f.bjet2_hhbtag,  # noqa
+                    f.fatjet_px,
+                    f.fatjet_py,
+                    f.fatjet_pz,
+                    f.fatjet_e,
+                    f.htt_e,
+                    f.htt_px,
+                    f.htt_py,
+                    f.htt_pz,
+                    f.hbb_e,
+                    f.hbb_px,
+                    f.hbb_py,
+                    f.hbb_pz,
+                    f.htthbb_e,
+                    f.htthbb_px,
+                    f.htthbb_py,
+                    f.htthbb_pz,
+                    f.httfatjet_e,
+                    f.httfatjet_px,
+                    f.httfatjet_py,
+                    f.httfatjet_pz,
+                    cont_ones * mass,
+                ]
+            ],
             axis=1,
         )
         cat_ones = np.ones_like(f.pair_type)
         cat_inputs = tf.concat(
-            [t[..., None] for t in [
-                f.pair_type, f.dau1_dm, f.dau2_dm, f.dau1_charge, f.dau2_charge, f.is_boosted, f.has_bjet_pair,
-                cat_ones * era.value, cat_ones * spin,
-            ]],
+            [
+                t[..., None]
+                for t in [
+                    f.pair_type,
+                    f.dau1_dm,
+                    f.dau2_dm,
+                    f.dau1_charge,
+                    f.dau2_charge,
+                    f.is_boosted,
+                    f.has_bjet_pair,
+                    cat_ones * era.value,
+                    cat_ones * spin,
+                ]
+            ],
             axis=1,
         )
 
@@ -201,7 +297,9 @@ class DotDict(dict):
         try:
             return self[attr]
         except KeyError:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
+            raise AttributeError(
+                f"'{self.__class__.__name__}' object has no attribute '{attr}'"
+            )
 
     def __setattr__(self, attr: str, value: Any) -> None:
         self[attr] = value

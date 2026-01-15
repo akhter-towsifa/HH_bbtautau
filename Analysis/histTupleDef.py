@@ -1,0 +1,121 @@
+import importlib
+from FLAF.Common.Utilities import *
+from FLAF.Common.HistHelper import *
+from Corrections.Corrections import Corrections
+from Corrections.CorrectionsCore import getSystName, central
+from Analysis.GetCrossWeights import *
+
+initialized = False
+analysis = None
+
+
+def Initialize():
+    global initialized
+    if not initialized:
+        headers_dir = os.path.dirname(os.path.abspath(__file__))
+        ROOT.gROOT.ProcessLine(f".include {os.environ['ANALYSIS_PATH']}")
+        ROOT.gInterpreter.Declare(f'#include "FLAF/include/HistHelper.h"')
+        ROOT.gInterpreter.Declare(f'#include "FLAF/include/Utilities.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/MT2.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/Lester_mt2_bisect.cpp"')
+        ROOT.gROOT.ProcessLine('#include "FLAF/include/AnalysisTools.h"')
+        ROOT.gROOT.ProcessLine('#include "FLAF/include/AnalysisMath.h"')
+        initialized = True
+
+
+def analysis_setup(setup):
+    global analysis
+    analysis_import = setup.global_params["analysis_import"]
+    analysis = importlib.import_module(f"{analysis_import}")
+
+
+def GetDfw(df, global_params):
+    period = global_params["era"]
+    kwargset = {}
+
+    kwargset["isData"] = global_params["process_group"] == "data"
+    kwargset["wantTriggerSFErrors"] = global_params["compute_rel_weights"]
+    kwargset["wantScales"] = global_params["compute_unc_variations"]
+    kwargset["colToSave"] = []
+    kwargset["deepTauVersion"] = global_params["deepTauVersion"]
+    kwargset["bTagWPString"] = "Medium"
+    kwargset["pNetWPstring"] = "Loose"
+    kwargset["region"] = global_params["region"]
+    kwargset["isCentral"] = True
+    datasetType = 3
+    if global_params["process_name"] == "TT":
+        datasetType = 1
+    if global_params["process_name"] == "DY":
+        datasetType = 2
+    kwargset["whichType"] = datasetType
+    dfw = analysis.DataFrameBuilderForHistograms(df, global_params, period, **kwargset)
+    new_dfw = analysis.PrepareDfForHistograms(dfw)
+    return new_dfw
+
+
+central_df_weights_computed = False
+
+
+def DefineWeightForHistograms(
+    *,
+    dfw,
+    isData,
+    uncName,
+    uncScale,
+    unc_cfg_dict,
+    hist_cfg_dict,
+    global_params,
+    final_weight_name,
+    df_is_central,
+):
+    global central_df_weights_computed
+    is_central = uncName == central
+    if not isData and (not central_df_weights_computed or not df_is_central):
+        corrections = Corrections.getGlobal()
+        lepton_legs = ["tau1", "tau2"]
+        offline_legs = ["tau1", "tau2", "b1", "b2"]
+        triggers_to_use = set()
+        channels = global_params["channelSelection"]
+        for channel in channels:
+            trigger_list = global_params.get("triggers", {}).get(channel, [])
+            for trigger in trigger_list:
+                if trigger not in corrections.trigger_dict.keys():
+                    raise RuntimeError(
+                        f"Trigger does not exist in triggers.yaml, {trigger}"
+                    )
+                triggers_to_use.add(trigger)
+        dfw.df, all_weights = corrections.getNormalisationCorrections(
+            dfw.df,
+            lepton_legs=lepton_legs,
+            offline_legs=offline_legs,
+            trigger_names=triggers_to_use,
+            unc_source=uncName,
+            unc_scale=uncScale,
+            ana_caches=None,
+            return_variations=is_central and global_params["compute_unc_histograms"],
+            use_genWeight_sign_only=True,
+        )
+        if "trigger" in global_params.get("corrections", {}):
+            defineTriggersCentralWeights(dfw)
+            defineTriggersWeightsErrors(dfw)
+        if df_is_central:
+            central_df_weights_computed = True
+    categories = global_params["categories"]
+    boosted_categories = global_params.get("boosted_categories", [])
+    process_group = global_params["process_group"]
+    total_weight_expression = (
+        # channel, cat, boosted_categories --> these are not needed in the GetWeight function therefore I just put some placeholders
+        analysis.GetWeight(global_params["channels_to_consider"])
+        if process_group != "data"
+        else "1"
+    )  # are we sure?
+    weight_name = "final_weight"
+    if weight_name not in dfw.df.GetColumnNames():
+        dfw.df = dfw.df.Define(weight_name, total_weight_expression)
+    if not is_central and type(unc_cfg_dict) == dict:
+        if (
+            uncName in unc_cfg_dict.keys()
+            and "expression" in unc_cfg_dict[uncName].keys()
+        ):
+            weight_name = unc_cfg_dict[uncName]["expression"].format(scale=uncScale)
+    dfw.df = dfw.df.Define(final_weight_name, weight_name)

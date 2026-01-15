@@ -6,11 +6,11 @@ norm:
   L1Prefiring:
     expression: weight_L1PreFiring{scale}_rel  * final_weight
   # L1Prefiring_ECAL:
-    # expression: weight_L1PreFiring_ECAL{scale}_rel * final_weight
+  #    expression: weight_L1PreFiring_ECAL{scale}_rel * final_weight
   # L1Prefiring_Muon_Stat:
-    # expression: weight_L1PreFiring_Muon_Stat{scale}_rel * final_weight
+  #   expression: weight_L1PreFiring_Muon_Stat{scale}_rel * final_weight
   # L1Prefiring_Muon_Syst:
-    # expression: weight_L1PreFiring_Muon_Syst{scale}_rel * final_weight
+  #   expression: weight_L1PreFiring_Muon_Syst{scale}_rel * final_weight
   pNet_SF:
     expression: weight_pNet_{scale}_rel * final_weight
   bTagShape_lf:
@@ -104,7 +104,7 @@ norm:
   MuID_Reco:
     expression: weight_tau1_MuonID_SF_Reco{scale}_rel * weight_tau2_MuonID_SF_Reco{scale}_rel *final_weight
   MuID_TightID:
-     expression: weight_tau1_MuonID_SF_TightID_Trk{scale}_rel * weight_tau2_MuonID_SF_TightID_Trk{scale}_rel *final_weight
+    expression: weight_tau1_MuonID_SF_TightID_Trk{scale}_rel * weight_tau2_MuonID_SF_TightID_Trk{scale}_rel *final_weight
   MuID_TightRelIso:
     expression: weight_tau1_MuonID_SF_TightRelIso{scale}_rel * weight_tau2_MuonID_SF_TightRelIso{scale}_rel * final_weight
 

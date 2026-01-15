@@ -1,2 +1,67 @@
-norm: []
-shape: []
+norm:
+  PileUp_Lumi_MC:
+    expression: weight_MC_Lumi_pu{scale}_rel  * final_weight
+    name: CMS_pileup_{}
+  MuonID_TightID:
+    expression: weight_tau1_MuonID_SF_TightID_Trk{scale}_rel * weight_tau2_MuonID_SF_TightID_Trk{scale}_rel * final_weight
+    name: MuonID_TightID
+  MuonID_TightIDIso:
+    expression: weight_tau1_MuonID_SF_LoosePFIso{scale}_rel * weight_tau2_MuonID_SF_LoosePFIso{scale}_rel * final_weight
+    name: MuonID_TightIDIso
+  trg_eTau_e:
+    expression: weight_trgSF_eTau_eleg_{scale}_rel * final_weight
+    name: trg_eTau_e_{}
+  trg_eTau_tau_dm0:
+    expression: weight_trgSF_eTau_tauleg_dm0_{scale}_rel * final_weight
+    name: trg_eTau_tau_dm0_{}
+  trg_eTau_tau_dm1:
+    expression: weight_trgSF_eTau_tauleg_dm1_{scale}_rel * final_weight
+    name: trg_eTau_tau_dm1_{}
+  trg_eTau_tau_dm10:
+    expression: weight_trgSF_eTau_tauleg_dm10_{scale}_rel * final_weight
+    name: trg_eTau_tau_dm10_{}
+  trg_eTau_tau_dm11:
+    expression: weight_trgSF_eTau_tauleg_dm11_{scale}_rel * final_weight
+    name: trg_eTau_tau_dm11_{}
+  trg_muTau_mu:
+    expression: weight_trgSF_muTau_muleg_{scale}_rel * final_weight
+    name: trg_muTau_mu_{}
+  trg_muTau_tau_dm0:
+    expression: weight_trgSF_muTau_tauleg_dm0_{scale}_rel * final_weight
+    name: trg_muTau_tau_dm0_{}
+  trg_muTau_tau_dm1:
+    expression: weight_trgSF_muTau_tauleg_dm1_{scale}_rel * final_weight
+    name: trg_muTau_tau_dm1_{}
+  trg_muTau_tau_dm10:
+    expression: weight_trgSF_muTau_tauleg_dm10_{scale}_rel * final_weight
+    name: trg_muTau_tau_dm10_{}
+  trg_muTau_tau_dm11:
+    expression: weight_trgSF_muTau_tauleg_dm11_{scale}_rel * final_weight
+    name: trg_muTau_tau_dm11_{}
+  trg_tauTau_tau_dm0:
+    expression: weight_trgSF_tauTau_tau1leg_dm0_{scale}_rel * weight_trgSF_tauTau_tau2leg_dm0_{scale}_rel  * final_weight
+    name: trg_tauTau_tau_dm0_{}
+  trg_tauTau_tau_dm1:
+    expression: weight_trgSF_tauTau_tau1leg_dm1_{scale}_rel * weight_trgSF_tauTau_tau2leg_dm1_{scale}_rel  * final_weight
+    name: trg_tauTau_tau_dm1_{}
+  trg_tauTau_tau_dm10:
+    expression: weight_trgSF_tauTau_tau1leg_dm10_{scale}_rel * weight_trgSF_tauTau_tau2leg_dm10_{scale}_rel  * final_weight
+    name: trg_tauTau_tau_dm10_{}
+  trg_tauTau_tau_dm11:
+    expression: weight_trgSF_tauTau_tau1leg_dm11_{scale}_rel * weight_trgSF_tauTau_tau2leg_dm11_{scale}_rel  * final_weight
+    name: trg_tauTau_tau_dm11_{}
+  trg_tauTau_jet:
+    expression: weight_trgSF_tauTau_jetleg_{scale}_rel * final_weight
+    name: trg_tauTau_jet_{}
+  trg_muMueMu:
+    expression: weight_trgSF_muMueMu_{scale}_rel * final_weight
+    name: trg_muMueMu_{}
+  trg_eE:
+    expression: weight_trgSF_eE_{scale}_rel * final_weight
+    name: trg_eE_{}
+
+shape: # syst unc conventions here: https://gitlab.cern.ch/cms-analysis/general/systematics
+  JES_Total:
+    name: CMS_scale_j_{}
+  JER:
+    name: CMS_res_j_{}

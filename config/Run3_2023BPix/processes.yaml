@@ -1,0 +1,247 @@
+DY:
+  name: "DY"
+  color: "kAzure-9"
+  sub_processes:
+    - DY_M_10to50
+    - DYto2E_M_50
+    - DYto2Mu_M_50
+    - DYto2Tau_M_50
+
+DY_M_10to50:
+  name: "DY M10to50"
+  color: "kAzure+10"
+  datasets:
+    - DYto2E_M_10to50_amcatnloFXFX
+    - DYto2Mu_M_10to50_amcatnloFXFX
+    - DYto2Tau_M_10to50_amcatnloFXFX
+
+DYto2E_M_50:
+  processors: *DY_processors
+  datasets:
+    - DYto2E_M_50_amcatnloFXFX
+    - DYto2E_M_50_0J_amcatnloFXFX
+    - DYto2E_M_50_1J_amcatnloFXFX
+    - DYto2E_M_50_2J_amcatnloFXFX
+    - DYto2E_M_50_PTLL_40to100_1J_amcatnloFXFX
+    - DYto2E_M_50_PTLL_100to200_1J_amcatnloFXFX
+    - DYto2E_M_50_PTLL_200to400_1J_amcatnloFXFX
+    - DYto2E_M_50_PTLL_400to600_1J_amcatnloFXFX
+    - DYto2E_M_50_PTLL_600_1J_amcatnloFXFX
+    - DYto2E_M_50_PTLL_40to100_2J_amcatnloFXFX
+    - DYto2E_M_50_PTLL_100to200_2J_amcatnloFXFX
+    - DYto2E_M_50_PTLL_200to400_2J_amcatnloFXFX
+    - DYto2E_M_50_PTLL_400to600_2J_amcatnloFXFX
+    - DYto2E_M_50_PTLL_600_2J_amcatnloFXFX
+
+DYto2Mu_M_50:
+  processors: *DY_processors
+  datasets:
+    - DYto2Mu_M_50_amcatnloFXFX
+    - DYto2Mu_M_50_0J_amcatnloFXFX
+    - DYto2Mu_M_50_1J_amcatnloFXFX
+    - DYto2Mu_M_50_2J_amcatnloFXFX
+    - DYto2Mu_M_50_PTLL_40to100_1J_amcatnloFXFX
+    - DYto2Mu_M_50_PTLL_100to200_1J_amcatnloFXFX
+    - DYto2Mu_M_50_PTLL_200to400_1J_amcatnloFXFX
+    - DYto2Mu_M_50_PTLL_400to600_1J_amcatnloFXFX
+    - DYto2Mu_M_50_PTLL_600_1J_amcatnloFXFX
+    - DYto2Mu_M_50_PTLL_40to100_2J_amcatnloFXFX
+    - DYto2Mu_M_50_PTLL_100to200_2J_amcatnloFXFX
+    - DYto2Mu_M_50_PTLL_200to400_2J_amcatnloFXFX
+    - DYto2Mu_M_50_PTLL_400to600_2J_amcatnloFXFX
+    - DYto2Mu_M_50_PTLL_600_2J_amcatnloFXFX
+
+DYto2Tau_M_50:
+  processors: *DY_processors
+  datasets:
+    - DYto2Tau_M_50_0J_amcatnloFXFX
+    - DYto2Tau_M_50_1J_amcatnloFXFX
+    - DYto2Tau_M_50_2J_amcatnloFXFX
+
+TT:
+  name: "t#bar{t}"
+  color: "kGreen-3"  # eliminates need for plot.yaml
+  datasets:
+    - TTto2L2Nu
+    - TTtoLNu2Q
+    - TTto4Q
+
+TT_Inclusive:
+  name: "t#bar{t} Inclusive"
+  color: "kGreen-3"
+  datasets:
+    - TT
+
+ST:
+  name: "Single Top"
+  color: "kGreen-5"
+  datasets:
+    - TbarBtoLminusNuB_s_channel_4FS
+    - TBbartoLplusNuBbar_s_channel_4FS
+    - TbarBQ_t_channel_4FS
+    - TBbarQ_t_channel_4FS
+    - TbarWplusto2L2Nu
+    # - TbarWplusto2L2Nu_ext1
+    - TbarWplusto4Q
+    # - TbarWplusto4Q_ext1
+    - TbarWplustoLNu2Q
+    # - TbarWplustoLNu2Q_ext1
+    - TWminusto2L2Nu
+    # - TWminusto2L2Nu_ext1
+    - TWminusto4Q
+    # - TWminusto4Q_ext1
+    - TWminustoLNu2Q
+    # - TWminustoLNu2Q_ext1
+
+ttH:
+  name: "ttH"
+  color: "kGreen-7"
+  datasets:
+    - TTHtoNon2B_M125
+    - TTHto2B_M125
+
+WtoLNu:
+  name: "W+jets"
+  color: "kOrange"
+  datasets:
+    - WtoLNu_0J_amcatnloFXFX
+    - WtoLNu_1J_amcatnloFXFX
+    - WtoLNu_2J_amcatnloFXFX
+
+VV:
+  name: "VV"
+  color: "kRed+1"
+  datasets:
+    - WWto2L2Nu_powheg
+    # - WWto2L2Nu_powheg_ext1
+    - WWtoLNu2Q_powheg
+    # - WWtoLNu2Q_powheg_ext1
+    - WWto4Q_powheg
+    # - WWto4Q_powheg_ext1
+    - WZto3LNu_powheg
+    - WZto2L2Q_powheg
+    # - WZto2L2Q_powheg_ext1
+    - WZtoLNu2Q_powheg
+    # - WZtoLNu2Q_powheg_ext1
+    - ZZto4L_powheg
+    # - ZZto4L_powheg_ext1
+    - ZZto2L2Nu_powheg
+    # - ZZto2L2Nu_powheg_ext1
+    - ZZto2L2Q_powheg
+    # - ZZto2L2Q_powheg_ext1
+    - ZZto2Nu2Q_powheg
+    # - ZZto2Nu2Q_powheg_ext1
+
+VVV:
+  name: "VVV"
+  color: "kRed+4"
+  datasets:
+    - WWW_4F
+    - WWZ_4F
+    - WZZ
+    - ZZZ
+
+VBFH:
+  name: "VBF H"
+  color: "kCyan-7"
+  datasets:
+    - VBFHto2B_M125
+    - VBFHto2Tau_UncorrelatedDecay_UnFiltered
+    # - VBFHto2Tau_UncorrelatedDecay_Filtered
+
+ggH:
+  name: "ggH"
+  color: "kMagenta-7"
+  datasets:
+    - GluGluHto2Tau_M125
+    # - GluGluHto2Tau_UncorrelatedDecay_Filtered
+    - GluGluHto2Tau_UncorrelatedDecay_UnFiltered
+    - GluGluHto2B_M125
+    - GluGluHto2Wto2L2Nu_M125
+
+VH:
+  name: "VH"
+  color: "kMagenta-3"
+  datasets:
+    - ggZH_Hto2B_Zto2L
+    # - ggZH_Hto2B_Zto2L_ext1
+    - ggZH_Hto2B_Zto2Q
+    # - ggZH_Hto2B_Zto2Q_ext1
+    - WminusH_Hto2B_WtoLNu
+    # - WminusH_Hto2B_WtoLNu_ext1
+    - WminusH_Hto2B_Wto2Q
+    # - WminusH_Hto2B_Wto2Q_ext1
+    # - WminusHto2Tau_UncorrelatedDecay_Filtered
+    - WminusHto2Tau_UncorrelatedDecay_UnFiltered
+    - WplusH_Hto2B_WtoLNu
+    # - WplusH_Hto2B_WtoLNu_ext1
+    - WplusH_Hto2B_Wto2Q
+    # - WplusH_Hto2B_Wto2Q_ext1
+    # - WplusHto2Tau_UncorrelatedDecay_Filtered
+    - WplusHto2Tau_UncorrelatedDecay_UnFiltered
+
+GluGlutoHHto2B2Tau:
+  name: "GluGlutoHHto2B2Tau"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: ^GluGlutoHHto2B2Tau_kl_([a-zA-Z0-9\-\.]+)_kt_([a-zA-Z0-9\-\.]+)_c2_([a-zA-Z0-9\-\.]+)$
+    parameters: [ kl, kt, c2 ]
+    process_name: GluGluToHHto2B2Tau_${kl}_${kt}_${c2}
+    name_pattern: GluGluToHHto2B2Tau kl ${kl} kt ${kt} c2 ${c2}
+    to_plot:
+      - [ '0p00', '1p00', '0p00' ]
+      - [ '1p00', '1p00', '0p00' ]  # This is the sample the robot tests
+    plot_color: [ "kBlack", "kRed" ]
+  datasets:
+    - GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00
+    - GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_1p00
+    - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00
+    # - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00_LHEweights
+    - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p10
+    - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35
+    - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_3p00
+    - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_m2p00
+    - GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00
+    # - GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00_LHEweights
+    - GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00
+
+VBFHHto2B2Tau:
+  name: "VBFHHto2B2Tau"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: ^VBFHHto2B2Tau_CV_([a-zA-Z0-9\-\.]+)_C2V_([a-zA-Z0-9\-\.]+)_C3_([a-zA-Z0-9\-\.]+)_fixedTauDecays$
+    parameters: [ CV, C2V, C3 ]
+    process_name: VBFHHto2B2Tau_${CV}_${C2V}_${C3}
+    name_pattern: VBFHHto2B2Tau CV ${CV} C2V ${C2V} C3 ${C3}
+    to_plot:
+      - [ '1', '0', '1' ]
+    plot_color: [ "kBlack" ]
+  datasets:
+    - VBFHHto2B2Tau_CV_1_C2V_0_C3_1_fixedTauDecays
+    - VBFHHto2B2Tau_CV_1_C2V_1_C3_1_fixedTauDecays
+    - VBFHHto2B2Tau_CV_1p74_C2V_1p37_C3_14p4_fixedTauDecays
+    - VBFHHto2B2Tau_CV_2p12_C2V_3p87_C3_m5p96_fixedTauDecays
+    - VBFHHto2B2Tau_CV_m0p012_C2V_0p030_C3_10p2_fixedTauDecays
+    - VBFHHto2B2Tau_CV_m0p758_C2V_1p44_C3_m19p3_fixedTauDecays
+    - VBFHHto2B2Tau_CV_m0p962_C2V_0p959_C3_m1p43_fixedTauDecays
+    - VBFHHto2B2Tau_CV_m1p21_C2V_1p94_C3_m0p94_fixedTauDecays
+    - VBFHHto2B2Tau_CV_m1p60_C2V_2p72_C3_m1p36_fixedTauDecays
+    - VBFHHto2B2Tau_CV_m1p83_C2V_3p57_C3_m3p39_fixedTauDecays
+
+Data:
+  name: "Data"
+  datasets:
+    - EGamma0_Run2023D_v1
+    - EGamma0_Run2023D_v2
+    - EGamma1_Run2023D_v1
+    - EGamma1_Run2023D_v2
+    - Muon0_Run2023D_v1
+    - Muon0_Run2023D_v2
+    - Muon1_Run2023D_v1
+    - Muon1_Run2023D_v2
+    - MuonEG_Run2023D_v1
+    - MuonEG_Run2023D_v2
+    - Tau_Run2023D_v1
+    - Tau_Run2023D_v2

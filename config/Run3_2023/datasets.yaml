@@ -1,0 +1,326 @@
+GluGlutoBulkGravitontoHHto2B2Tau_M_250:
+  mass: 250
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_260:
+  mass: 260
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_270:
+  mass: 270
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_280:
+  mass: 280
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_300:
+  mass: 300
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_350:
+  mass: 350
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_450:
+  mass: 450
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_550:
+  mass: 550
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_600:
+  mass: 600
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_650:
+  mass: 650
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_700:
+  mass: 700
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_800:
+  mass: 800
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_1000:
+  mass: 1000
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_1200:
+  mass: 1200
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_1400:
+  mass: 1400
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_1600:
+  mass: 1600
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_1800:
+  mass: 1800
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_2000:
+  mass: 2000
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_2500:
+  mass: 2500
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_3000:
+  mass: 3000
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_4000:
+  mass: 4000
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoBulkGravitontoHHto2B2Tau_M_5000:
+  mass: 5000
+  spin: 2
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_250:
+  mass: 250
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_260:
+  mass: 260
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_270:
+  mass: 270
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_280:
+  mass: 280
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_300:
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_350:
+  mass: 350
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_450:
+  mass: 450
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_550:
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_600:
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_650:
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_700:
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_800:
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_1000:
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_1200:
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_1400:
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_1600:
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_1800:
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_2000:
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_2500:
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_3000:
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_4000:
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+GluGlutoRadiontoHHto2B2Tau_M_5000:
+  mass: 5000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+# ###################Non-resonant signals###########
+GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_1p00:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00_LHEweights:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p10:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p35:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_3p00:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_m2p00:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00_LHEweights:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+VBFHHto2B2Tau_CV_1_C2V_0_C3_1_fixedTauDecays:
+  generator: madgraph
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+VBFHHto2B2Tau_CV_1_C2V_1_C3_1_fixedTauDecays:
+  generator: madgraph
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+VBFHHto2B2Tau_CV_1p74_C2V_1p37_C3_14p4_fixedTauDecays:
+  generator: madgraph
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+VBFHHto2B2Tau_CV_2p12_C2V_3p87_C3_m5p96_fixedTauDecays:
+  generator: madgraph
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+VBFHHto2B2Tau_CV_m0p012_C2V_0p030_C3_10p2_fixedTauDecays:
+  generator: madgraph
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+VBFHHto2B2Tau_CV_m0p758_C2V_1p44_C3_m19p3_fixedTauDecays:
+  generator: madgraph
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+VBFHHto2B2Tau_CV_m0p962_C2V_0p959_C3_m1p43_fixedTauDecays:
+  generator: madgraph
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+VBFHHto2B2Tau_CV_m1p21_C2V_1p94_C3_m0p94_fixedTauDecays:
+  generator: madgraph
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+VBFHHto2B2Tau_CV_m1p60_C2V_2p72_C3_m1p36_fixedTauDecays:
+  generator: madgraph
+  mass: 125
+  spin: 0
+  crossSection: 1pb
+VBFHHto2B2Tau_CV_m1p83_C2V_3p57_C3_m3p39_fixedTauDecays:
+  generator: madgraph
+  mass: 125
+  spin: 0
+  crossSection: 1pb

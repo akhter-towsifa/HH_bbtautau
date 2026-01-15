@@ -1,0 +1,25 @@
+authorized_users:
+  - kandrosov
+  - acagnotta
+  - Sayan-Dhani
+  - prabhatsolanki
+  - akhter-towsifa
+  - vdamante
+
+expected_headers:
+  - "@cms-flaf-bot test"
+  - "@cms-flaf-bot please test"
+  - "[@cms-flaf-bot](https://github.com/cms-flaf-bot) test"
+  - "[@cms-flaf-bot](https://github.com/cms-flaf-bot) please test"
+
+variables:
+  HH_bbtautau_version: "main"
+  FLAF_version: "default"
+  Corrections_version: "default"
+  HH_bbtautau_active: "1"
+  HH_bbtautau_task: "FLAF.Analysis.tasks.HistPlotTask"
+  HH_bbtautau_args: "--branches 0 --dataset GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00 --test 1000"
+  TEST_TIMEOUT: "4h"
+
+gitlab_url: "https://gitlab.cern.ch/api/v4/projects/210600/trigger/pipeline"
+gitlab_branch: "master"
