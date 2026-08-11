@@ -730,6 +730,7 @@ def defineAllP4(df, isData=False):
     for idx in [0, 1]:
         df = Utilities.defineP4(df, f"tau{idx+1}")
         df = Utilities.defineP4(df, f"b{idx+1}")
+    df = df.Define("Njets", "nBJets") # nBJets = Jet_p4[Jet_bCand].size()
     if not isData:
         df = df.Define(f"pt_ll_gen", f"LHE_Vpt")
     for met_var in ["met", "metnomu"]:
