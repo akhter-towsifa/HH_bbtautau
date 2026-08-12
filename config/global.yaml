@@ -124,7 +124,7 @@ corrections:
   dy_hhbbtautau:
     stages: [ HistTuple ]
     processes: [ DY_M_10to50, DYto2E_M_50, DYto2Mu_M_50, DYto2Tau_M_50 ]
-    njets_branch: Njets
+    njets_branch: nBJets
   bosonicRecoil:
     stage: HistTuple
     method: QuantileMapHist # Rescaling
