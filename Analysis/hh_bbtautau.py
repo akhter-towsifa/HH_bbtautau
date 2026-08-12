@@ -494,19 +494,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define("bjet1_isValid", "nBJets > 0")
         self.df = self.df.Define("bjet2_isValid", "nBJets > 1")
 
-        cols = {str(c) for c in self.df.GetColumnNames()}
-        if "b1_idbtagPNetB" in cols:
-            nBjets_PNetTag = (
-                "int(bjet1_isValid && b1_idbtagPNetB >= 2) "
-                "+ int(bjet2_isValid && b2_idbtagPNetB >= 2)"
-            )
-        else:
-            score = "btagUParTAK4B" if "b1_btagUParTAK4B" in cols else "btagPNetB"
-            wp = WorkingPointsParticleNet[self.period]["Medium"]
-            nBjets_PNetTag = (
-                f"int(bjet1_isValid && b1_{score} >= {wp}) "
-                f"+ int(bjet2_isValid && b2_{score} >= {wp})"
-            )
+        nBjets_PNetTag = f"int(bjet1_isValid && b1_idbtagPNetB >= 2) + int( bjet2_isValid && b2_idbtagPNetB >= 2)"
 
         # self.df = self.df.Define(
         #     "nSelBtag",
@@ -730,7 +718,6 @@ def defineAllP4(df, isData=False):
     for idx in [0, 1]:
         df = Utilities.defineP4(df, f"tau{idx+1}")
         df = Utilities.defineP4(df, f"b{idx+1}")
-    df = df.Define("Njets", "nBJets")  # nBJets = Jet_p4[Jet_bCand].size()
     if not isData:
         df = df.Define(f"pt_ll_gen", f"LHE_Vpt")
     for met_var in ["met", "metnomu"]:
