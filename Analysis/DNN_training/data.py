@@ -4,6 +4,7 @@ import glob
 import os
 from dataclasses import dataclass
 
+import awkward as ak
 import numpy as np
 import uproot
 import yaml
@@ -31,6 +32,16 @@ from .config import (
 # already documents the feature set consumed at inference time; this list is
 # the raw-branch superset needed to reconstruct that, plus selection/weight/
 # label branches.
+#
+# NOTE: "SelectedFatJet_{pt,eta,phi,mass}_boosted" and "boosted_baseline" are
+# NOT raw anaTuple branches -- confirmed by inspecting a real v2605 anaTuple
+# (root://cmseos.fnal.gov//eos/uscms/store/group/lpcflaf/HH_bbtautau/v2605/
+# AnaTuples/Run3_2022EE/DYto2E_M_50_amcatnloFXFX/anaTuple_0.root). They're
+# derived downstream by hh_bbtautau.py::defineBoostedVariables() via
+# RDataFrame (FLAF's RemoveOverlaps/ReorderObjects C++ helpers), which never
+# runs on the raw AnaTuples/ files this loader reads. Instead we read the raw
+# jagged SelectedFatJet_{pt,eta,phi,mass,particleNet_XbbVsQCD} branches and
+# reproduce that derivation in _derive_boosted_fatjet() below.
 RAW_BRANCHES = [
     "event", "channelId",
     "tau1_pt", "tau1_eta", "tau1_phi", "tau1_mass", "tau1_charge", "tau1_decayMode",
@@ -39,12 +50,19 @@ RAW_BRANCHES = [
     "b1_btagDeepFlavB", "b1_btagPNetCvB", "b1_btagPNetCvL", "b1_HHbtag",
     "b2_pt", "b2_eta", "b2_phi", "b2_mass",
     "b2_btagDeepFlavB", "b2_btagPNetCvB", "b2_btagPNetCvL", "b2_HHbtag",
-    "SelectedFatJet_pt_boosted", "SelectedFatJet_eta_boosted",
-    "SelectedFatJet_phi_boosted", "SelectedFatJet_mass_boosted",
+    "SelectedFatJet_pt", "SelectedFatJet_eta", "SelectedFatJet_phi", "SelectedFatJet_mass",
+    "SelectedFatJet_particleNet_XbbVsQCD",
     "met_pt", "met_phi", "met_covXX", "met_covXY", "met_covYY",
-    "boosted_baseline", "Hbb_isValid",
+    "Hbb_isValid",
     "weight_base",
+    "tau1_Muon_tightId", "tau1_Muon_pfRelIso04_all",
 ]
+
+
+def raw_branches(deep_tau_branch: str) -> list[str]:
+    """RAW_BRANCHES plus the DeepTauVSjet ID branches for both tau legs, whose
+    name depends on cfg.deep_tau_branch (era/version dependent)."""
+    return RAW_BRANCHES + [f"tau1_{deep_tau_branch}", f"tau2_{deep_tau_branch}"]
 
 
 @dataclass
@@ -96,12 +114,41 @@ def resolve_class_datasets(class_name: str, era: str, config_dir: str) -> list[s
     return datasets
 
 
+def _list_xrootd_root_files(dir_url: str) -> list[str]:
+    """Lists *.root files under a root://host//path directory URL via the
+    XRootD client -- glob.glob only understands local filesystem paths, not
+    remote XRootD URLs, so a separate remote-listing path is needed."""
+    from urllib.parse import urlsplit
+
+    from XRootD import client
+
+    parts = urlsplit(dir_url)
+    server = f"{parts.scheme}://{parts.netloc}"
+    fs_path = parts.path[1:] if parts.path.startswith("//") else parts.path
+
+    fs = client.FileSystem(server)
+    status, listing = fs.dirlist(fs_path)
+    if not status.ok:
+        return []
+    names = sorted(entry.name for entry in listing if entry.name.endswith(".root"))
+    return [f"{server}//{fs_path}/{name}" for name in names]
+
+
 def anatuple_files(data_root: str, era: str, dataset: str) -> list[str]:
-    """Locate merged anaTuple ROOT files for one (era, dataset), mirroring the
-    AnaTupleMergeTask output layout seen under bbtautau/data/v*/AnaTupleMergeTask/
-    {era}/{dataset}/*.root."""
-    pattern = os.path.join(data_root, "AnaTupleMergeTask", era, dataset, "*.root")
-    return sorted(glob.glob(pattern))
+    """Locate anaTuple ROOT files for one (era, dataset) under
+    {data_root}/AnaTuples/{era}/{dataset}/*.root -- confirmed against the real
+    v2605 production layout on FNAL EOS (see module docstring note on
+    RAW_BRANCHES). Supports both local filesystem paths (glob) and
+    root://host//path XRootD URLs (remote directory listing), which is how
+    the davs://cmseos.fnal.gov:9000/... production storage in
+    bbtautau/config/user_custom.yaml is read for bulk uproot access -- davs is
+    a WebDAV endpoint uproot/XRootD don't speak directly, so point --data-root
+    at the equivalent root://cmseos.fnal.gov//eos/uscms/... form instead (same
+    underlying EOS instance, same path after the host)."""
+    dir_path = os.path.join(data_root, "AnaTuples", era, dataset)
+    if dir_path.startswith("root://"):
+        return _list_xrootd_root_files(dir_path)
+    return sorted(glob.glob(os.path.join(dir_path, "*.root")))
 
 
 def iter_events(files: list[str], branches: list[str], step_size: str, tree_name: str = "Events"):
@@ -208,6 +255,60 @@ def _apply_rotation_and_composites(f: dict) -> dict:
     return f
 
 
+def _delta_r(eta1, phi1, eta2, phi2):
+    deta = eta1 - eta2
+    dphi = np.arctan2(np.sin(phi1 - phi2), np.cos(phi1 - phi2))  # wrap to [-pi, pi]
+    return np.sqrt(deta**2 + dphi**2)
+
+
+def _derive_boosted_fatjet(array) -> dict[str, np.ndarray]:
+    """Reproduces hh_bbtautau.py::defineBoostedVariables(): among FatJets with
+    pt>250 that don't overlap either tau (deltaR>0.8 from *both* tau1 and
+    tau2), picks the one with the highest particleNet_XbbVsQCD score. Ported
+    here rather than reused because the original is RDataFrame/C++ (FLAF's
+    RemoveOverlaps/ReorderObjects in FLAF/include/AnalysisTools.h), not
+    callable from Python:
+      - RemoveOverlaps(obj_p4, pre_sel, {tau1_p4, tau2_p4}, 0.8) (the 4-arg
+        overload) drops an object if it's within deltaR<=0.8 of *any* of the
+        given other objects -- i.e. requires deltaR>0.8 from both taus.
+      - ReorderObjects sorts descending by the given score and the "_boosted"
+        columns take index 0 of that ordering.
+    Returns flat per-event arrays (0.0 / False where no FatJet passes -- those
+    events get zeroed out downstream anyway by _apply_rotation_and_composites'
+    fj_mask, keyed on is_boosted/boosted_baseline).
+    """
+    fj_pt = array["SelectedFatJet_pt"]
+    fj_eta = array["SelectedFatJet_eta"]
+    fj_phi = array["SelectedFatJet_phi"]
+    fj_mass = array["SelectedFatJet_mass"]
+    fj_xbb = array["SelectedFatJet_particleNet_XbbVsQCD"]
+
+    dr_tau1 = _delta_r(fj_eta, fj_phi, array["tau1_eta"], array["tau1_phi"])
+    dr_tau2 = _delta_r(fj_eta, fj_phi, array["tau2_eta"], array["tau2_phi"])
+    fatjet_sel = (fj_pt > 250) & (dr_tau1 > 0.8) & (dr_tau2 > 0.8)
+
+    boosted_baseline = np.asarray(ak.sum(fatjet_sel, axis=1) >= 1)
+
+    xbb_masked = ak.where(fatjet_sel, fj_xbb, -np.inf)
+    leading = ak.argmax(xbb_masked, axis=1, keepdims=True)
+
+    def _take(field):
+        picked = np.asarray(ak.fill_none(ak.firsts(field[leading]), 0.0))
+        # ak.argmax still returns an index among the -inf-masked entries when
+        # an event has FatJets but none pass fatjet_sel (list non-empty, all
+        # masked) -- it's None (-> filled to 0 above) only when the list is
+        # truly empty. Force 0 explicitly wherever no FatJet actually passed.
+        return np.where(boosted_baseline, picked, 0.0)
+
+    return {
+        "boosted_baseline": boosted_baseline.astype(np.float64),
+        "SelectedFatJet_pt_boosted": _take(fj_pt),
+        "SelectedFatJet_eta_boosted": _take(fj_eta),
+        "SelectedFatJet_phi_boosted": _take(fj_phi),
+        "SelectedFatJet_mass_boosted": _take(fj_mass),
+    }
+
+
 def build_features(array, period: str) -> tuple[dict[str, np.ndarray], np.ndarray, np.ndarray]:
     """Turns a selected awkward-array chunk into (cat_inputs, lbn_vectors,
     extra_continuous), reusing DNN_application.convert_to_numpy() for the raw
@@ -221,6 +322,9 @@ def build_features(array, period: str) -> tuple[dict[str, np.ndarray], np.ndarra
     for this training) applied to the raw channelId, so the old TF model's
     category numbering never leaks into this pipeline.
     """
+    for name, values in _derive_boosted_fatjet(array).items():
+        array = ak.with_field(array, values, name)
+
     raw = convert_to_numpy(array, period, mass=0.0, spin=0)  # mass/spin unused by the GGF net
     f = {k: np.asarray(v).astype(np.float64) if np.asarray(v).dtype.kind == "f" else np.asarray(v)
          for k, v in raw.items()}
@@ -256,7 +360,7 @@ def load_shard(
         return None
 
     cat_chunks, lbn_chunks, cont_chunks, weight_chunks, event_chunks = [], [], [], [], []
-    for chunk in iter_events(files, RAW_BRANCHES, cfg.step_size):
+    for chunk in iter_events(files, raw_branches(cfg.deep_tau_branch), cfg.step_size):
         mask = select_training_events(chunk, cfg.deep_tau_branch, cfg.deep_tau_medium_wp)
         if not np.any(mask):
             continue

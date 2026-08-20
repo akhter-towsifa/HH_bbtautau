@@ -139,8 +139,10 @@ class DataConfig:
         default_factory=lambda: {c: 1.0 / len(CLASSES) for c in CLASSES}
     )
     step_size: str = "50 MB"  # uproot.iterate step size, matches AnalysisCacheProducer.py
-    deep_tau_branch: str = ""  # e.g. "idDeepTau2018v2p5VSjet" -- set per era/version
-    deep_tau_medium_wp: int = -1  # from FLAF.Common.Utilities.WorkingPointsTauVSjet.Medium.value
+    # Confirmed against a real v2605 Run3_2022EE anaTuple; FLAF.Common.Utilities.
+    # WorkingPointsTauVSjet.Medium.value == 5. Re-verify if other eras/versions differ.
+    deep_tau_branch: str = "idDeepTau2018v2p5VSjet"
+    deep_tau_medium_wp: int = 5
 
 
 @dataclass
