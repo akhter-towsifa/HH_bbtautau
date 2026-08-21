@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 from dataclasses import dataclass, field
 import yaml
 
@@ -133,7 +134,14 @@ class KFoldConfig:
 class DataConfig:
     data_root: str = ""  # local/EOS directory containing AnaTupleMergeTask-style output
     eras: list[str] = field(default_factory=lambda: list(ERAS))
-    config_dir: str = "bbtautau/config"  # holds {era}/{datasets,processes}.yaml
+    # Absolute by default (via ANALYSIS_PATH, set by env.sh to the bbtautau/
+    # checkout root -- same variable DNN_application.py itself relies on), so
+    # this doesn't silently break depending on the caller's cwd the way a
+    # plain relative "bbtautau/config" string would. Holds
+    # {era}/{datasets,processes}.yaml.
+    config_dir: str = field(
+        default_factory=lambda: os.path.join(os.environ.get("ANALYSIS_PATH", "bbtautau"), "config")
+    )
     batch_size: int = 4096
     class_weights: dict[str, float] = field(
         default_factory=lambda: {c: 1.0 / len(CLASSES) for c in CLASSES}

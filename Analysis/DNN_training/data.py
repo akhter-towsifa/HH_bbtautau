@@ -91,16 +91,52 @@ def _expand_process_group(processes: dict, group_name: str) -> list[str]:
     return entry.get("datasets", [])
 
 
+def _load_merged_yaml(paths: list[str], file_name: str, special_items_prefix: str = ".") -> dict:
+    """Mirrors FLAF.Common.Setup.Config: concatenates *file_name*'s raw text
+    from every existing directory in *paths* (in order) and parses the result
+    as a *single* YAML document, so cross-file anchors/aliases resolve
+    correctly. processes.yaml relies on this: the top-level
+    bbtautau/config/processes.yaml defines e.g. "&DY_processors" (as a
+    dot-prefixed, merge-only key), and the era-specific
+    bbtautau/config/{era}/processes.yaml aliases it via "*DY_processors".
+    Parsing each file separately with plain yaml.safe_load() raises
+    "found undefined alias" since anchors don't carry across independent
+    yaml.safe_load() calls -- they only resolve within one parse.
+    """
+    yaml_str = ""
+    for path in paths:
+        full_path = os.path.join(path, file_name)
+        if os.path.exists(full_path):
+            with open(full_path) as f:
+                yaml_str += f.read() + "\n"
+    if not yaml_str:
+        raise FileNotFoundError(f"{file_name} not found in any of {paths}")
+    merged = yaml.safe_load(yaml_str) or {}
+    if special_items_prefix is not None:
+        merged = {k: v for k, v in merged.items() if not k.startswith(special_items_prefix)}
+    return merged
+
+
 def resolve_class_datasets(class_name: str, era: str, config_dir: str) -> list[str]:
-    """Expand a background class into its underlying dataset names by reading
-    bbtautau/config/{era}/processes.yaml. Wildcard group names (ending in "*")
-    match by prefix against the top-level process-group keys."""
+    """Expand a background class into its underlying dataset names from
+    processes.yaml. Wildcard group names (ending in "*") match by prefix
+    against the top-level process-group keys.
+
+    *config_dir* is expected to be ".../bbtautau/config" (DataConfig's
+    default); the matching ".../bbtautau/FLAF/config" is derived from it and
+    searched too, mirroring FLAF.Common.Setup.Setup.config_path_order.
+    """
     if class_name == "HH":
         return [hh_dataset_name(kl, kt, c2) for kl, kt, c2 in HH_SIGNAL_POINTS]
 
-    processes_path = os.path.join(config_dir, era, "processes.yaml")
-    with open(processes_path) as f:
-        processes = yaml.safe_load(f)
+    ana_path = os.path.dirname(config_dir.rstrip("/"))
+    search_paths = [
+        os.path.join(ana_path, "FLAF", "config"),
+        os.path.join(ana_path, "FLAF", "config", era),
+        config_dir,
+        os.path.join(config_dir, era),
+    ]
+    processes = _load_merged_yaml(search_paths, "processes.yaml")
 
     datasets: list[str] = []
     for group_pattern in CLASS_PROCESS_GROUPS[class_name]:
@@ -187,14 +223,24 @@ def select_training_events(array, deep_tau_branch: str, medium_wp: int) -> np.nd
     tau1_iso_medium = np.where(
         is_tautau, np.asarray(array[f"tau1_{deep_tau_branch}"]) >= medium_wp, True
     )
+    # tau1_Muon_tightId is int32 (1/0, with -1 as a "tau1 isn't a muon" sentinel
+    # for non-muTau events), NOT a real bool branch -- compare with `== 1`
+    # explicitly rather than using it directly as a boolean, otherwise `&`
+    # against it silently promotes the whole expression (and everything
+    # combined with it below) from bool to int32.
     muon1_tight = np.where(
         is_mutau,
-        np.asarray(array["tau1_Muon_tightId"]) & (np.asarray(array["tau1_Muon_pfRelIso04_all"]) < 0.15),
+        (np.asarray(array["tau1_Muon_tightId"]) == 1) & (np.asarray(array["tau1_Muon_pfRelIso04_all"]) < 0.15),
         True,
     )
     lepton_preselection = tau1_iso_medium & muon1_tight
 
-    return channel_mask & os_mask & tau2_iso & lepton_preselection
+    mask = channel_mask & os_mask & tau2_iso & lepton_preselection
+    # Defensive: chunk[mask] / array[mask] on a non-bool mask silently becomes
+    # integer fancy-indexing instead of boolean filtering (wrong length-
+    # preserving garbage, no error) -- force bool no matter what dtype the
+    # branches above end up promoting to.
+    return mask.astype(bool)
 
 
 def _rotate_to_phi(ref_phi: np.ndarray, px: np.ndarray, py: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -321,16 +367,22 @@ def build_features(array, period: str) -> tuple[dict[str, np.ndarray], np.ndarra
     field is overwritten below using config.PAIRTYPE_MAP (our own convention
     for this training) applied to the raw channelId, so the old TF model's
     category numbering never leaks into this pipeline.
+
+    NOTE: convert_to_numpy() mutates its input's "channelId" field in place,
+    overwriting it with *its own* pairtype_map encoding (0/1/2) as a side
+    effect -- so the raw channelId (13/23/33) must be captured before calling
+    it, not after.
     """
     for name, values in _derive_boosted_fatjet(array).items():
         array = ak.with_field(array, values, name)
+
+    channel_id = np.asarray(array["channelId"])  # must run before convert_to_numpy (see NOTE above)
 
     raw = convert_to_numpy(array, period, mass=0.0, spin=0)  # mass/spin unused by the GGF net
     f = {k: np.asarray(v).astype(np.float64) if np.asarray(v).dtype.kind == "f" else np.asarray(v)
          for k, v in raw.items()}
     f = _apply_rotation_and_composites(f)
 
-    channel_id = np.asarray(array["channelId"])
     f["pair_type"] = np.vectorize(PAIRTYPE_MAP.get)(channel_id).astype(np.int64)
 
     index_maps = categorical_index_maps()

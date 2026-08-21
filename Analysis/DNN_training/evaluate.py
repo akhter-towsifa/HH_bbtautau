@@ -50,10 +50,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default=None)
     parser.add_argument("--data-root", required=True)
+    parser.add_argument(
+        "--era", nargs="+", default=None,
+        help="eras to evaluate on -- should match whatever --era the fold was trained with, "
+             "since the train/val/test fold split is over the combined dataset across eras",
+    )
     parser.add_argument("--fold", type=int, required=True)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     args = parser.parse_args()
 
     cfg = TrainingConfig.from_yaml(args.config) if args.config else TrainingConfig()
     cfg.data.data_root = args.data_root
+    if args.era is not None:
+        cfg.data.eras = args.era
     evaluate_fold(cfg, args.fold, args.device)

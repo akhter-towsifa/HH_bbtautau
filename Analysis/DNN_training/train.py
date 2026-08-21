@@ -225,6 +225,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default=None)
     parser.add_argument("--data-root", required=True)
+    parser.add_argument(
+        "--era", nargs="+", default=None,
+        help="one or more eras to train on (default: config.ERAS, i.e. all configured eras). "
+             "Not every era has anaTuples produced at all times -- use this to restrict to "
+             "whichever are actually available, e.g. --era Run3_2022EE",
+    )
     parser.add_argument("--fold", type=int, default=None, help="train a single fold (default: all 5)")
     parser.add_argument("--n-seeds", type=int, default=None)
     parser.add_argument("--output-dir", default=None)
@@ -233,6 +239,8 @@ def main():
 
     cfg = TrainingConfig.from_yaml(args.config) if args.config else TrainingConfig()
     cfg.data.data_root = args.data_root
+    if args.era is not None:
+        cfg.data.eras = args.era
     if args.n_seeds is not None:
         cfg.kfold.n_seeds = args.n_seeds
     if args.output_dir is not None:
