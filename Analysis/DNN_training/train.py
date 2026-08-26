@@ -167,8 +167,11 @@ def train_one_model(
     def diagnostic_weight_fn(shard: DatasetShard) -> np.ndarray:
         return shard.weight * class_scale[shard.class_name]
 
+    print(f"[fold {test_fold} seed {seed}] building train/val tensors ...", flush=True)
     train_split = gather_split(shards, train_idx, device, weight_fn=diagnostic_weight_fn)
     val_split = gather_split(shards, val_idx, device, weight_fn=diagnostic_weight_fn)
+    print(f"[fold {test_fold} seed {seed}] train={len(train_split[3])} val={len(val_split[3])} events, "
+          f"{cfg.optim.batches_per_epoch} batches/epoch", flush=True)
 
     model = GGFClassifier(cfg.model, categorical_cardinalities()).to(device)
     optimizer = build_optimizer(model, cfg.optim.initial_lr, cfg.optim.weight_decay_factor)
@@ -186,7 +189,9 @@ def train_one_model(
         epoch = 0
         while epochs_without_improvement < cfg.optim.early_stop_patience:
             model.train()
-            for _ in range(cfg.optim.batches_per_epoch):
+            for batch_num in range(cfg.optim.batches_per_epoch):
+                if batch_num % 500 == 0:
+                    print(f"[fold {test_fold} seed {seed}] epoch {epoch}: batch {batch_num}/{cfg.optim.batches_per_epoch}", flush=True)
                 batch_idx = torch.as_tensor(next(batch_iter), device=device, dtype=torch.long)
                 cat_b = {k: v[batch_idx] for k, v in train_split[0].items()}
                 lbn_b = train_split[1][batch_idx]
@@ -246,14 +251,17 @@ def main():
     if args.output_dir is not None:
         cfg.output_dir = args.output_dir
 
+    print(f"[train] loading shards from {cfg.data.data_root} (eras={cfg.data.eras}) ...", flush=True)
     shards = load_all_shards(cfg.data, cfg.kfold.n_folds)
     if not shards:
         raise RuntimeError(f"No anaTuple shards found under {cfg.data.data_root}; check --data-root and config.")
+    print(f"[train] loaded {len(shards)} shard(s), starting training", flush=True)
 
     folds = [args.fold] if args.fold is not None else range(cfg.kfold.n_folds)
     for fold in folds:
         seed_models = []
         for seed in range(cfg.kfold.n_seeds):
+            print(f"[train] fold {fold} seed {seed}: starting", flush=True)
             log_path = os.path.join(cfg.output_dir, f"logs/fold{fold}_seed{seed}.csv")
             model = train_one_model(shards, fold, seed, cfg, args.device, log_path)
             seed_dir = os.path.join(cfg.output_dir, f"fold{fold}_seed{seed}")

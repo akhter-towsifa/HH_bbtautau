@@ -410,9 +410,11 @@ def load_shard(
     files = anatuple_files(cfg.data_root, era, dataset)
     if not files:
         return None
+    print(f"[data] {class_name}/{era}/{dataset}: {len(files)} file(s) found", flush=True)
 
     cat_chunks, lbn_chunks, cont_chunks, weight_chunks, event_chunks = [], [], [], [], []
-    for chunk in iter_events(files, raw_branches(cfg.deep_tau_branch), cfg.step_size):
+    n_selected = 0
+    for i, chunk in enumerate(iter_events(files, raw_branches(cfg.deep_tau_branch), cfg.step_size)):
         mask = select_training_events(chunk, cfg.deep_tau_branch, cfg.deep_tau_medium_wp)
         if not np.any(mask):
             continue
@@ -423,6 +425,9 @@ def load_shard(
         cont_chunks.append(extra_continuous)
         weight_chunks.append(np.asarray(selected["weight_base"]))
         event_chunks.append(np.asarray(selected["event"]))
+        n_selected += len(selected)
+        if i % 20 == 0:
+            print(f"[data]   chunk {i}: total {n_selected} selected so far", flush=True)
 
     if not lbn_chunks:
         return None
@@ -457,8 +462,9 @@ def load_all_shards(cfg: DataConfig, n_folds: int) -> list[DatasetShard]:
                 shard = load_shard(class_name, era, dataset, cfg, n_folds)
                 if shard is not None:
                     shards.append(shard)
+                    print(f"[data] loaded {class_name}/{era}/{dataset}: {len(shard.weight)} events", flush=True)
                 else:
-                    print(f"[data] no events/files for {class_name}/{era}/{dataset}, skipping")
+                    print(f"[data] no events/files for {class_name}/{era}/{dataset}, skipping", flush=True)
     return shards
 
 
