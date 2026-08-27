@@ -125,6 +125,7 @@ corrections:
     stages: [ HistTuple ]
     processes: [ DY_M_10to50, DYto2E_M_50, DYto2Mu_M_50, DYto2Tau_M_50 ]
     njets_branch: nBJets
+    ntags_branch: nBjets_PNetTag
   bosonicRecoil:
     stage: HistTuple
     method: QuantileMapHist # Rescaling
@@ -164,6 +165,15 @@ histTuple_flavors:
       - tau1_pt
       - ggF_DNN_HH
   DNN_training:
+    # Full AN-25-103 Sec. 5.3 GGF DNN input list (matches payload_producers.
+    # ggF_DNN.features below) plus the selection/weight/label branches needed
+    # to build training data outside the live RDataFrame pipeline (see
+    # Analysis/DNN_training/data.py), plus kinFit_m (see LegacyVariables.
+    # GetKinFit, now wired into DataFrameBuilderForHistograms alongside
+    # defineBoostedVariables()). NOTE: verify `region`/`custom_categories`
+    # are set to the wide, non-signal-region phase space AN Sec. 5.3.1
+    # requires for training data (not narrowed to a specific jet category or
+    # mass window) before running HistTupleProducerTask with this flavor.
     fullResolution_variables:
       - event
       - channelId

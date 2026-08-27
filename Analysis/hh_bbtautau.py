@@ -521,7 +521,19 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define("bjet1_isValid", "nBJets > 0")
         self.df = self.df.Define("bjet2_isValid", "nBJets > 1")
 
-        nBjets_PNetTag = f"int(bjet1_isValid && b1_idbtagPNetB >= 2) + int( bjet2_isValid && b2_idbtagPNetB >= 2)"
+        cols = {str(c) for c in self.df.GetColumnNames()}
+        if "b1_idbtagPNetB" in cols:
+            nBjets_PNetTag = (
+                "int(bjet1_isValid && b1_idbtagPNetB >= 2) "
+                "+ int(bjet2_isValid && b2_idbtagPNetB >= 2)"
+            )
+        else:
+            score = "btagUParTAK4B" if "b1_btagUParTAK4B" in cols else "btagPNetB"
+            wp = WorkingPointsParticleNet[self.period]["Medium"]
+            nBjets_PNetTag = (
+                f"int(bjet1_isValid && b1_{score} >= {wp}) "
+                f"+ int(bjet2_isValid && b2_{score} >= {wp})"
+            )
 
         # self.df = self.df.Define(
         #     "nSelBtag",
