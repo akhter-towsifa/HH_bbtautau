@@ -165,15 +165,6 @@ histTuple_flavors:
       - tau1_pt
       - ggF_DNN_HH
   DNN_training:
-    # Full AN-25-103 Sec. 5.3 GGF DNN input list (matches payload_producers.
-    # ggF_DNN.features below) plus the selection/weight/label branches needed
-    # to build training data outside the live RDataFrame pipeline (see
-    # Analysis/DNN_training/data.py), plus kinFit_m (see LegacyVariables.
-    # GetKinFit, now wired into DataFrameBuilderForHistograms alongside
-    # defineBoostedVariables()). NOTE: verify `region`/`custom_categories`
-    # are set to the wide, non-signal-region phase space AN Sec. 5.3.1
-    # requires for training data (not narrowed to a specific jet category or
-    # mass window) before running HistTupleProducerTask with this flavor.
     fullResolution_variables:
       - event
       - channelId
@@ -221,6 +212,7 @@ histTuple_flavors:
       - met_covYY
       - Hbb_isValid
       - kinFit_m
+      - kinFit_chi2
       - weight_base
     variables:
       - event
@@ -269,6 +261,7 @@ histTuple_flavors:
       - met_covYY
       - Hbb_isValid
       - kinFit_m
+      - kinFit_chi2
       - weight_base
 
 treeName: "Events"

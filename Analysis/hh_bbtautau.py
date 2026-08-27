@@ -366,26 +366,11 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
                 )
 
     def defineKinFit(self):  # needs p4 def
-        """HHKinFit2-based kinematic fit mass (kinFit_m) and its diagnostics
-        (kinFit_chi2, kinFit_convergence). Wraps LegacyVariables.GetKinFit
-        (AnaProd/LegacyVariables.py), previously dead code: it was only ever
-        called from AnaProd/addLegacyVariables.py::applyLegacyVariables(),
-        which is not invoked anywhere in the anaTuple/histTuple pipeline, and
-        which imported a nonexistent "FLAF.Common.LegacyVariables" module
-        (the real one lives at AnaProd/LegacyVariables.py -- fixed there).
-        Computed here (HistTuple stage, post-selection) rather than at raw
-        AnaTuple production, since the fit is iterative/expensive and most
-        AnaTuple events never reach a HistTuple anyway.
-        The raw kinFit_result struct this produces is excluded from the saved
-        columns in addNewCols() (not a flat/snapshot-able type); only the
-        scalar kinFit_m/kinFit_chi2/kinFit_convergence fields are kept.
-        NOTE: unlike defineBoostedVariables()/the rest of this module, this
-        wiring has not been exercised against a live RDataFrame run yet --
-        watch for compile errors from KinFitInterface.h or a missing
-        "entry_valid"/"b{1,2}_ptRes" column the first time this actually runs.
-        """
+        """HHKinFit2-based kinematic fit mass (kinFit_m) and its diagnostics (kinFit_chi2, kinFit_convergence)."""
         if not LegacyVariables.initialized:
             LegacyVariables.Initialize(load_kinfit=True, load_svfit=False, load_mt2=False)
+        if "entry_valid" not in self.df.GetColumnNames():
+            self.df = self.df.Define("entry_valid", "Hbb_isValid")
         self.df, kinfit_cols = LegacyVariables.GetKinFit(self.df)
         for col in kinfit_cols:
             if col != "kinFit_result":  # raw C++ struct, not snapshot-able -- see addNewCols()

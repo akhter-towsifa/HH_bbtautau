@@ -4,10 +4,10 @@ from dataclasses import dataclass, field
 import yaml
 
 # Class order used throughout this package. Index 0 is the signal class; the
-# remaining three are the backgrounds requested for this training. Note this
+# remaining four are the backgrounds requested for this training. Note this
 # differs from AN-25-103 Sec. 5.3, which only trains against TT/DY -- single
-# Higgs is an addition on top of the AN for this pipeline.
-CLASSES = ["HH", "TT", "DY", "SingleH"]
+# Higgs and single top are additions on top of the AN for this pipeline.
+CLASSES = ["HH", "TT", "DY", "SingleH", "ST"]
 CLASS_INDEX = {name: i for i, name in enumerate(CLASSES)}
 
 HH_SIGNAL_POINTS = [
@@ -33,11 +33,13 @@ def hh_dataset_name(kl: str, kt: str, c2: str) -> str:
 # Background class -> process-group name(s) in bbtautau/config/{era}/processes.yaml.
 # "TT" and "DY" are meta-groups (DY has no direct `datasets:`, only
 # `sub_processes:` pointing at DY_M_10to50/DYto2E_M_50/DYto2Mu_M_50/DYto2Tau_M_50 --
-# resolve_class_datasets() in data.py follows that recursively).
+# resolve_class_datasets() in data.py follows that recursively). "ST" (Single
+# Top) has a direct `datasets:` list, same shape as "TT".
 CLASS_PROCESS_GROUPS = {
     "TT": ["TT"],
     "DY": ["DY"],
     "SingleH": ["ggH", "VBFH", "VH", "ttH"],
+    "ST": ["ST"],
 }
 
 # Eras used for training. NOTE: Run3_2025/Run3_2026 set reuse_mc_from_era:
