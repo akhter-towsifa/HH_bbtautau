@@ -6,6 +6,7 @@ if __name__ == "__main__":
 from FLAF.Common.HistHelper import *
 from Analysis.GetCrossWeights import *
 from Corrections.Corrections import Corrections
+import AnaProd.LegacyVariables as LegacyVariables
 
 # from Analysis.GetTauTauWeights import *
 from FLAF.Common.Utilities import *
@@ -364,6 +365,32 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
                                    """,
                 )
 
+    def defineKinFit(self):  # needs p4 def
+        """HHKinFit2-based kinematic fit mass (kinFit_m) and its diagnostics
+        (kinFit_chi2, kinFit_convergence). Wraps LegacyVariables.GetKinFit
+        (AnaProd/LegacyVariables.py), previously dead code: it was only ever
+        called from AnaProd/addLegacyVariables.py::applyLegacyVariables(),
+        which is not invoked anywhere in the anaTuple/histTuple pipeline, and
+        which imported a nonexistent "FLAF.Common.LegacyVariables" module
+        (the real one lives at AnaProd/LegacyVariables.py -- fixed there).
+        Computed here (HistTuple stage, post-selection) rather than at raw
+        AnaTuple production, since the fit is iterative/expensive and most
+        AnaTuple events never reach a HistTuple anyway.
+        The raw kinFit_result struct this produces is excluded from the saved
+        columns in addNewCols() (not a flat/snapshot-able type); only the
+        scalar kinFit_m/kinFit_chi2/kinFit_convergence fields are kept.
+        NOTE: unlike defineBoostedVariables()/the rest of this module, this
+        wiring has not been exercised against a live RDataFrame run yet --
+        watch for compile errors from KinFitInterface.h or a missing
+        "entry_valid"/"b{1,2}_ptRes" column the first time this actually runs.
+        """
+        if not LegacyVariables.initialized:
+            LegacyVariables.Initialize(load_kinfit=True, load_svfit=False, load_mt2=False)
+        self.df, kinfit_cols = LegacyVariables.GetKinFit(self.df)
+        for col in kinfit_cols:
+            if col != "kinFit_result":  # raw C++ struct, not snapshot-able -- see addNewCols()
+                self.colToSave.append(col)
+
     def defineTriggers(self):
         for ch in self.config["channelSelection"]:
             for trg in self.config["triggers"][ch]:
@@ -612,13 +639,17 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
     def addNewCols(self):
         self.colNames = []
         self.colTypes = []
-        colNames = [
-            str(c) for c in self.df.GetColumnNames()
-        ]  # if 'kinFit_result' not in str(c)]
+        colNames = [str(c) for c in self.df.GetColumnNames()]
         cols_to_remove = []
         for colName in colNames:
             col_name_split = colName.split("_")
             if "p4" in col_name_split or "vec" in col_name_split:
+                cols_to_remove.append(colName)
+            # kinFit_result is a raw kin_fit::FitResults C++ struct (from
+            # defineKinFit()/LegacyVariables.GetKinFit), not a flat/snapshot-able
+            # type -- only its scalar fields (kinFit_m, kinFit_chi2,
+            # kinFit_convergence) should be saved.
+            if colName == "kinFit_result":
                 cols_to_remove.append(colName)
         for col_to_remove in cols_to_remove:
             colNames.remove(col_to_remove)
@@ -689,6 +720,7 @@ def PrepareDfForHistograms(dfForHistograms):
 
     dfForHistograms.defineTriggers()
     dfForHistograms.defineBoostedVariables()
+    dfForHistograms.defineKinFit()
     dfForHistograms.redefinePUJetIDWeights()
     dfForHistograms.df = createInvMass(dfForHistograms.df)
     dfForHistograms.defineChannels()

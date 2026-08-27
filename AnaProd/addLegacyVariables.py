@@ -1,5 +1,5 @@
 import ROOT
-import FLAF.Common.LegacyVariables as LegacyVariables
+import AnaProd.LegacyVariables as LegacyVariables
 import FLAF.Common.Utilities as Utilities
 import sys
 import os
