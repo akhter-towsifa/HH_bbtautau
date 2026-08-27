@@ -1,5 +1,5 @@
 import os
-from .Utilities import *
+from FLAF.Common.Utilities import *
 
 initialized = False
 
