@@ -69,6 +69,7 @@ DYto2Mu_M_50:
 
 DYto2Tau_M_50:
   processors: *DYtautau_processors
+  genInfo: [ DY, TauTau ]
   datasets:
     - DYto2Tau_M_50_0J_amcatnloFXFX
     - DYto2Tau_M_50_1J_amcatnloFXFX
@@ -85,6 +86,7 @@ TT:
   name: "t#bar{t}"
   color: "kGreen-3"  # eliminates need for plot.yaml
   processors: *TT_processors
+  genInfo: [ TT ]
   datasets:
     - TT
     - TTto2L2Nu
@@ -220,8 +222,9 @@ GluGlutoHHto2B2Tau:
   name: "GluGlutoHHto2B2Tau"
   color: "kBlack"
   is_meta_process: true
+  processors: *ext_processors
   meta_setup:
-    dataset_name_pattern: ^GluGlutoHHto2B2Tau_kl_([a-zA-Z0-9\-\.]+)_kt_([a-zA-Z0-9\-\.]+)_c2_([a-zA-Z0-9\-\.]+)$
+    dataset_name_pattern: ^GluGlutoHHto2B2Tau_kl_([mp0-9]+)_kt_([mp0-9]+)_c2_([mp0-9]+).*$
     parameters: [ kl, kt, c2 ]
     process_name: GluGluToHHto2B2Tau_${kl}_${kt}_${c2}
     name_pattern: GluGluToHHto2B2Tau kl ${kl} kt ${kt} c2 ${c2}
@@ -239,7 +242,7 @@ GluGlutoHHto2B2Tau:
     - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_3p00
     - GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_m2p00
     - GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00
-    # - GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00_LHEweights
+    - GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00_LHEweights
     - GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00
 
 VBFHHto2B2Tau:
@@ -282,11 +285,27 @@ Data:
     - Tau_Run2023D_v1
     - Tau_Run2023D_v2
 
-custom_CI_Background:
-  name: "CI -- Background"
+# The integration test runs one t#bar{t} and one DY dataset, each carrying the processors the
+# analysis really uses for that process in this era. That is what exercises a stitcher over the
+# whole anaTuple -> merge chain, where a gen-level input the anaTuple does not keep would
+# otherwise only surface in production. One dataset per process is enough: each stitching bin's
+# denominator is summed over the very events that later read it back, so a bin no event falls
+# into is never divided by.
+custom_CI_Background_TT:
+  name: "CI -- Background t#bar{t}"
   color: "kGreen-3"
+  processors: *TT_processors
+  genInfo: [ TT ]
   datasets:
     - TTto2L2Nu
+
+custom_CI_Background_DY:
+  name: "CI -- Background DY"
+  color: "kAzure+7"
+  processors: *DYtautau_processors
+  genInfo: [ DY, TauTau ]
+  datasets:
+    - DYto2Tau_M_50_2J_amcatnloFXFX
 
 custom_CI_Signal:
   name: "custom for CI and test purposes"

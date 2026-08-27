@@ -226,6 +226,13 @@ GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00:
   crossSection: GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00
   nanoAOD:
     v15: /GluGluHHto2B2Tau_Par-c2-0p00-kl-0p00-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-PowhegBugFix_150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM
+GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00_ext1:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_0p00
+  nanoAOD:
+    v15: /GluGluHHto2B2Tau_Par-c2-0p00-kl-0p00-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-PowhegBugFix_150X_mcRun3_2024_realistic_v2_ext1-v2/NANOAODSIM
 GluGlutoHHto2B2Tau_kl_0p00_kt_1p00_c2_1p00:
   generator: powheg
   mass: 125
@@ -240,6 +247,13 @@ GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00:
   crossSection: GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00
   nanoAOD:
     v15: /GluGluHHto2B2Tau_Par-c2-0p00-kl-1p00-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-PowhegBugFix_150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM
+GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00_ext1:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00
+  nanoAOD:
+    v15: /GluGluHHto2B2Tau_Par-c2-0p00-kl-1p00-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-PowhegBugFix_150X_mcRun3_2024_realistic_v2_ext1-v2/NANOAODSIM
 GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p10:
   generator: powheg
   mass: 125
@@ -274,7 +288,14 @@ GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00:
   spin: 0
   crossSection: GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00
   nanoAOD:
-    v15: /GluGluHHto2B2Tau_Par-c2-0p00-kl-2p45-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-PowhegBugFix_150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM
+    v15: /GluGluHHto2B2Tau_Par-c2-0p00-kl-2p45-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-PowhegBugFix_150X_mcRun3_2024_realistic_v2-v1/NANOAODSIM
+GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00_ext1:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00
+  nanoAOD:
+    v15: /GluGluHHto2B2Tau_Par-c2-0p00-kl-2p45-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-PowhegBugFix_150X_mcRun3_2024_realistic_v2_ext1-v2/NANOAODSIM
 GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00:
   generator: powheg
   mass: 125
@@ -282,6 +303,13 @@ GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00:
   crossSection: GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00
   nanoAOD:
     v15: /GluGluHHto2B2Tau_Par-c2-0p00-kl-5p00-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-PowhegBugFix_150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM
+GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00_ext1:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: GluGlutoHHto2B2Tau_kl_5p00_kt_1p00_c2_0p00
+  nanoAOD:
+    v15: /GluGluHHto2B2Tau_Par-c2-0p00-kl-5p00-kt-1p00_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-PowhegBugFix_150X_mcRun3_2024_realistic_v2_ext1-v2/NANOAODSIM
 VBFHHto2B2Tau_CV_1_C2V_0_C3_1_fixedTauDecays:
   generator: madgraph
   mass: 125

@@ -235,6 +235,11 @@ GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00:
   mass: 125
   spin: 0
   crossSection: GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00
+GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00_LHEweights:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p00
 GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_0p10:
   generator: powheg
   mass: 125
@@ -256,6 +261,11 @@ GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_m2p00:
   spin: 0
   crossSection: GluGlutoHHto2B2Tau_kl_1p00_kt_1p00_c2_m2p00
 GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00:
+  generator: powheg
+  mass: 125
+  spin: 0
+  crossSection: GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00
+GluGlutoHHto2B2Tau_kl_2p45_kt_1p00_c2_0p00_LHEweights:
   generator: powheg
   mass: 125
   spin: 0

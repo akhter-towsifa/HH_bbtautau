@@ -47,6 +47,45 @@ variable, LAW pulls in the cache task automatically — see
 [FLAF → Task reference](https://cms-flaf.github.io/FLAF/reference/tasks/#analysiscachetask). Listing
 a short `variables:` set is the easiest way to keep test runs fast.
 
+## Stitched backgrounds: DY and t̄t
+
+DY and t̄t are stitched from several samples, so each event is normalised with the
+cross-section of the bin it belongs to
+([MC stitching](https://cms-flaf.github.io/FLAF/concepts/stitching/)). The bins select on
+gen-level quantities that nanoAOD does not provide directly, so the anaTuple stores them:
+
+| Branch | Stored for | Meaning |
+|---|---|---|
+| `DYInfo_flavor`, `DYInfo_mll` | `DYto2Tau_M_50` | flavour (11/13/15) and mass of the LHE dilepton pair |
+| `TauTauInfo_passFilter` | `DYto2Tau_M_50` | the Z→ττ generator filter decision, the axis that stitches the filtered samples in |
+| `TauTauInfo_vis_type{1,2}`, `TauTauInfo_vis_pt{1,2}`, `TauTauInfo_vis_abseta{1,2}` | `DYto2Tau_M_50` | the visible tau quantities the filter is made of, so its definition can be revisited without reprocessing |
+| `TTInfo_nLeptonicW`, `TTInfo_wDecay{1,2}` | `TT` | gen-level t̄t decay channel |
+
+Which of these a process gets is declared as `genInfo` next to its `processors` in
+`config/<era>/processes.yaml`, and only where a stitcher selects on it — adding a kind to a
+process that is already produced means producing it again; `AnaProd/genProcessInfo.py` turns that into the branches
+above. A process that stitches on one of these quantities without declaring `genInfo` fails
+in `AnaTupleMergeTask`, where `GenPart`/`LHEPart` are no longer available.
+
+The integration test guards this. `TestModel` runs two backgrounds — `custom_CI_Background_TT`,
+one t̄t dataset, and `custom_CI_Background_DY`, one DY→ττ dataset — and each carries the same
+`processors:` and `genInfo:` as the real `TT` and `DYto2Tau_M_50` process **for that era**
+(`TTStitcher` and `DYtautauStitcher` for 2022–2023BPix; the plain `MCStitcher` and no
+stitching of t̄t for 2024 onwards, which is what those eras configure). The stitchers therefore
+run over the whole anaTuple → merge → histogram chain in CI, which is exactly where a missing
+gen-level branch shows up. Change one of the real processes and change its CI counterpart with
+it.
+
+### Signal points with more than one sample
+
+Some GluGlutoHH points are produced more than once — an `_ext1` extension, or a variant
+carrying LHE weights. Both are declared and both are used, so the point gets all the
+statistics; the `GluGlutoHHto2B2Tau` process therefore carries the `*ext_processors`
+stitcher, which normalises the point with the summed event count instead of counting it
+twice ([MC stitching](https://cms-flaf.github.io/FLAF/concepts/stitching/)). Which samples
+exist differs per era — Run3_2022EE, for instance, has only the LHE-weighted variant of
+kl = 2.45 and no plain one.
+
 ## Quick stack plots
 
 For a fast look at distributions (outside the full `HistPlotTask` styling), the analysis ships a

@@ -4,6 +4,7 @@ import FLAF.Common.BaselineSelection as CommonBaseline
 from Corrections.Corrections import Corrections
 import ROOT
 from FLAF.Common.Utilities import defineP4
+from AnaProd.genProcessInfo import addGenProcessInfo
 
 loadTF = True
 loadHHBtag = True
@@ -221,12 +222,19 @@ def Initialize(setup, dataset_name):
             )
         ROOT.gInterpreter.Declare(f'#include "{header_path_HHbTag}"')
         ROOT.gInterpreter.Declare('#include "include/RecoilGenParticle.h"')
-        # Prefer FLAF_CMSSW_BASE: on CRAB/bundle workers scram may leave CMSSW_BASE
-        # pointing at the submit-host AFS path even though the release was relocated.
-        _cmssw = os.environ.get("FLAF_CMSSW_BASE") or os.environ["CMSSW_BASE"]
-        ROOT.gROOT.ProcessLine(
-            f'HHBtagWrapper::Initialize("{_cmssw}/src/HHTools/HHbtag/models/", 3)'
-        )
+        # Take the models from the analysis directory, which the bundle packs as real
+        # content. Inside CMSSW they are reached through src/HHTools/HHbtag, an absolute
+        # symlink to the analysis checkout that the bundle preserves verbatim (inner
+        # symlinks are kept on purpose, so that CVMFS ones are not dereferenced), so a job
+        # following it reads a 20 MB model from the submit host over AFS. A few thousand
+        # jobs doing that get batch submission throttled and the reads timed out.
+        _models = os.path.join(os.environ["ANALYSIS_PATH"], "HHbtag", "models")
+        if not os.path.isdir(_models):
+            # Prefer FLAF_CMSSW_BASE: on CRAB/bundle workers scram may leave CMSSW_BASE
+            # pointing at the submit-host AFS path even though the release was relocated.
+            _cmssw = os.environ.get("FLAF_CMSSW_BASE") or os.environ["CMSSW_BASE"]
+            _models = os.path.join(_cmssw, "src", "HHTools", "HHbtag", "models")
+        ROOT.gROOT.ProcessLine(f'HHBtagWrapper::Initialize("{_models}/", 3)')
 
         initialized = True
 
@@ -379,6 +387,8 @@ def addAllVariables(
         dfw.colToSave.append("LHE_NpNLO")
         dfw.colToSave.append("LHE_Nuds")
         dfw.colToSave.append("LHE_Vpt")
+
+        addGenProcessInfo(dfw, dataset_cfg.get("process_cfg", {}).get("genInfo", []))
 
         dfw.colToSave.append("GenJet_eta")
         dfw.colToSave.append("GenJet_hadronFlavour")

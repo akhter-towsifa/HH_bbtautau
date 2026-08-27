@@ -1,3 +1,16 @@
+.ext_processors: &ext_processors
+  # Several datasets of the same physics point (an extension sample, or a variant
+  # carrying LHE weights): one cross-section, and a denominator summed over all of
+  # them, so that adding statistics does not double-count the process.
+  - name: Stitcher
+    module: FLAF.Processors.MCStitching
+    class: MCStitcher
+    useDatasetCrossSection: true
+    stages: [ AnaTuple, AnaTupleMerge ]
+    dependency_level:
+      AnaTuple: file
+      AnaTupleMerge: process
+
 .DY_processors: &DY_processors
   - name: Stitcher
     module: FLAF.Processors.MCStitching
