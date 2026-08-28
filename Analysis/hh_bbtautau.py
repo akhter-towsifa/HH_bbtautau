@@ -650,13 +650,17 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
     def addNewCols(self):
         self.colNames = []
         self.colTypes = []
-        colNames = [
-            str(c) for c in self.df.GetColumnNames()
-        ]  # if 'kinFit_result' not in str(c)]
+        colNames = [str(c) for c in self.df.GetColumnNames()]
         cols_to_remove = []
         for colName in colNames:
             col_name_split = colName.split("_")
             if "p4" in col_name_split or "vec" in col_name_split:
+                cols_to_remove.append(colName)
+            # kinFit_result is a raw kin_fit::FitResults C++ struct (from
+            # defineKinFit()/LegacyVariables.GetKinFit), not a flat/snapshot-able
+            # type -- only its scalar fields (kinFit_m, kinFit_chi2,
+            # kinFit_convergence) should be saved.
+            if colName == "kinFit_result":
                 cols_to_remove.append(colName)
         for col_to_remove in cols_to_remove:
             colNames.remove(col_to_remove)
