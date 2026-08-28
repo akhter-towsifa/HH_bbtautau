@@ -153,7 +153,7 @@ muonID_WP_for_triggerSF: "Tight" # only medium or tight for trigger SF, both iso
 muIDWP: "Tight"
 muIsoWP: "Tight"
 
-histTuple_flavor: default
+histTuple_flavor: DNN_training
 histTuple_flavors:
   default:
     fullResolution_variables: [ ]
@@ -176,6 +176,110 @@ histTuple_flavors:
     variables:
       - tau1_pt
       - ggF_DNN_HH
+  DNN_training:
+    # Raw floats needed as DNN training inputs (Analysis/DNN_training/) --
+    # saved unbinned/full-precision under fullResolution_variables, and also
+    # listed under variables: (binned) per config/plot/histograms.yaml entries
+    # added for this flavor. kinFit_chi2 is the one exception: it's not a
+    # DNN training input (RAW_BRANCHES in data.py), has no histograms.yaml
+    # entry, and stays fullResolution-only.
+    fullResolution_variables:
+      - event
+      - channelId
+      - tau1_pt
+      - tau1_eta
+      - tau1_phi
+      - tau1_mass
+      - tau1_decayMode
+      - tau1_charge
+      - tau2_pt
+      - tau2_eta
+      - tau2_phi
+      - tau2_mass
+      - tau2_decayMode
+      - tau2_charge
+      - tau1_idDeepTau2018v2p5VSjet
+      - tau2_idDeepTau2018v2p5VSjet
+      - tau1_Muon_tightId
+      - tau1_Muon_pfRelIso04_all
+      - b1_pt
+      - b1_eta
+      - b1_phi
+      - b1_mass
+      - b1_btagDeepFlavB
+      - b1_btagPNetCvB
+      - b1_btagPNetCvL
+      - b1_HHbtag
+      - b2_pt
+      - b2_eta
+      - b2_phi
+      - b2_mass
+      - b2_btagDeepFlavB
+      - b2_btagPNetCvB
+      - b2_btagPNetCvL
+      - b2_HHbtag
+      - SelectedFatJet_pt_boosted
+      - SelectedFatJet_eta_boosted
+      - SelectedFatJet_phi_boosted
+      - SelectedFatJet_mass_boosted
+      - boosted_baseline
+      - met_pt
+      - met_phi
+      - met_covXX
+      - met_covXY
+      - met_covYY
+      - Hbb_isValid
+      - kinFit_m
+      - kinFit_chi2
+      - weight_base
+    variables:
+      - event
+      - channelId
+      - tau1_pt
+      - tau1_eta
+      - tau1_phi
+      - tau1_mass
+      - tau1_decayMode
+      - tau1_charge
+      - tau2_pt
+      - tau2_eta
+      - tau2_phi
+      - tau2_mass
+      - tau2_decayMode
+      - tau2_charge
+      - tau1_idDeepTau2018v2p5VSjet
+      - tau2_idDeepTau2018v2p5VSjet
+      - tau1_Muon_tightId
+      - tau1_Muon_pfRelIso04_all
+      - b1_pt
+      - b1_eta
+      - b1_phi
+      - b1_mass
+      - b1_btagDeepFlavB
+      - b1_btagPNetCvB
+      - b1_btagPNetCvL
+      - b1_HHbtag
+      - b2_pt
+      - b2_eta
+      - b2_phi
+      - b2_mass
+      - b2_btagDeepFlavB
+      - b2_btagPNetCvB
+      - b2_btagPNetCvL
+      - b2_HHbtag
+      - SelectedFatJet_pt_boosted
+      - SelectedFatJet_eta_boosted
+      - SelectedFatJet_phi_boosted
+      - SelectedFatJet_mass_boosted
+      - boosted_baseline
+      - met_pt
+      - met_phi
+      - met_covXX
+      - met_covXY
+      - met_covYY
+      - Hbb_isValid
+      - kinFit_m
+      - weight_base
 
 treeName: "Events"
 

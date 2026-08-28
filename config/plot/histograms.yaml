@@ -1015,3 +1015,197 @@ ggF_DNN_HH:
   use_log_y: False
   max_y_sf: 1.8
   divide_by_bin_width: False
+
+########## DNN_training raw variables BEGIN ##########
+# Binned versions of the raw HistTuple branches Analysis/DNN_training/data.py
+# reads (RAW_BRANCHES) -- needed so histTuple_flavors.DNN_training.variables
+# (config/global.yaml) can list them without findBinEntry() raising KeyError.
+# Several of these (event, weight_base, boosted_baseline, Hbb_isValid,
+# tau1_Muon_tightId) aren't physically meaningful to histogram -- ranges below
+# are placeholders so the pipeline runs; not intended for real stacked plots.
+
+event:
+  x_bins: "100|0:2000000000"
+  x_title: event number
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+channelId:
+  x_bins: "23|10.5:33.5"
+  x_title: channelId (10*leg1+leg2, e=1/mu=2/tau=3)
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+tau1_mass:
+  x_bins: "200|0:2"
+  x_title: mass(lep_{1}) (GeV)
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+tau1_charge:
+  x_bins: "5|-2.5:2.5"
+  x_title: tau1_charge
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+tau1_decayMode:
+  x_bins: "13|-1.5:11.5"
+  x_title: tau1 DeepTau decayMode (-1 = not a hadronic tau)
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+tau2_mass:
+  x_bins: "200|0:2"
+  x_title: mass(lep_{2}) (GeV)
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+tau2_charge:
+  x_bins: "5|-2.5:2.5"
+  x_title: tau2_charge
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+tau2_decayMode:
+  x_bins: "12|-0.5:11.5"
+  x_title: tau2 DeepTau decayMode
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+b1_mass:
+  x_bins: "40|0:80"
+  x_title: b-jet_1 mass
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+b1_btagPNetCvB:
+  x_bins: "100|0.:1."
+  x_title: b-jet_1 PNetCvB
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+b1_btagPNetCvL:
+  x_bins: "100|0.:1."
+  x_title: b-jet_1 PNetCvL
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+b2_btagPNetCvB:
+  x_bins: "100|0.:1."
+  x_title: b-jet_2 PNetCvB
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+b2_btagPNetCvL:
+  x_bins: "100|0.:1."
+  x_title: b-jet_2 PNetCvL
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+boosted_baseline:
+  x_bins: "2|-0.5:1.5"
+  x_title: boosted_baseline
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+met_covXX:
+  x_bins: "100|0:5000"
+  x_title: MET cov_{XX} (GeV^{2})
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+met_covXY:
+  x_bins: "100|-2500:2500"
+  x_title: MET cov_{XY} (GeV^{2})
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+met_covYY:
+  x_bins: "100|0:5000"
+  x_title: MET cov_{YY} (GeV^{2})
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+Hbb_isValid:
+  x_bins: "2|-0.5:1.5"
+  x_title: Hbb_isValid
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+weight_base:
+  x_bins: "500|-250:250"
+  x_title: weight_base
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+tau1_Muon_tightId:
+  x_bins: "3|-1.5:1.5"
+  x_title: tau1_Muon_tightId (-1 = tau1 isn't a muon)
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+tau1_Muon_pfRelIso04_all:
+  x_bins: "50|0:0.5"
+  x_title: Muon1_Iso
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+tau1_idDeepTau2018v2p5VSjet:
+  x_bins: "9|-0.5:8.5"
+  x_title: tau1 DeepTauVSjet WP
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+tau2_idDeepTau2018v2p5VSjet:
+  x_bins: "9|-0.5:8.5"
+  x_title: tau2 DeepTauVSjet WP
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+########## DNN_training raw variables END ##########
