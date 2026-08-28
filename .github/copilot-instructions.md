@@ -1,155 +1,123 @@
-# Copilot Instructions for HH_bbtautau
+# HH_bbtautau — instructions for Copilot code review
 
-## Repository Overview
+The HH→bb̄ττ analysis, and the reference analysis of the [FLAF](https://github.com/cms-flaf/FLAF)
+ecosystem: patterns land here first and are copied into HH_bbWW and H_mumu.
 
-This repository implements the HH→bbττ analysis for the CMS experiment at CERN. It uses the **FLAF** (Flexible LAW-based Analysis Framework) with Luigi workflow management for high-energy physics data analysis.
+**Read `FLAF/.github/copilot-instructions.md` first.** It carries the framework invariants — law
+task semantics, bundles, remote-storage caching, processor stages, concurrency — and the rules on
+what a useful comment looks like and what not to flag. The rule that documentation ships in the same PR applies here too, and is restated below with the pages that matter for this repository. Everything there applies here. This file
+adds only what is specific to this analysis.
 
-**Key characteristics:**
-- **Language**: Python (analysis code), C++ (physics algorithms), YAML (configuration)
-- **Framework**: LAW (Luigi Analysis Framework) for task workflows
-- **Purpose**: Search for Higgs boson pair production with bb and ττ final states
-- **Data**: CMS Run2 (2016-2018) and Run3 (2022-2023) collision data
+## What costs the most here
 
-## Project Structure
+A change to what the anaTuple stores or to which datasets a process declares can invalidate a
+production that took days of grid time. Prioritise anything that (a) changes the stored columns,
+(b) changes which datasets a process draws on, or (c) changes a normalisation.
 
-```
-HH_bbtautau/
-├── AnaProd/              # AnaTuple production code (main analysis)
-│   ├── anaTupleDef.py    # Variable definitions for analysis tuples
-│   ├── baseline.py       # Baseline selection cuts
-│   ├── interface.py      # Framework interface
-│   └── NNInterface.py    # Neural network interface
-├── Analysis/             # Analysis tasks and histogram production
-│   ├── hh_bbtautau.py    # Main analysis class
-│   ├── histTupleDef.py   # Histogram definitions
-│   └── make_stackplots.py
-├── Studies/              # Various analysis studies
-├── config/               # Configuration files
-│   ├── global.yaml       # Global configuration
-│   ├── law.cfg           # LAW task configuration
-│   ├── Run3_2022/        # Era-specific configs (samples, triggers, etc.)
-│   └── ...               # Other era configs
-├── include/              # C++ header files
-├── docs/                 # MkDocs documentation source
-├── FLAF/                 # Submodule: Core framework
-├── StatInference/        # Submodule: Statistical inference
-├── Corrections/          # Submodule: Physics corrections
-└── env.sh                # Environment setup script
-```
+## Analysis-specific invariants
 
-## Code Formatting Requirements
+### Stored gen-level information
 
-**All PRs must pass formatting checks.** The CI uses configuration from FLAF submodule:
+- `AnaProd/genProcessInfo.py` writes the gen-level quantities the MC stitching selects on
+  (`DYInfo_*`, `TauTauInfo_*`, `TTInfo_*`). The anaTuple drops `GenPart`/`LHEPart`, so anything a
+  stitching bin selects on **must** be stored here or the merge stage cannot evaluate it.
+- Which kinds a process gets is declared as `genInfo` in `config/<era>/processes.yaml`, next to
+  the `processors` that consume them. **The two must agree per era.** A process that stitches on a
+  quantity it does not declare fails in `AnaTupleMergeTask` with
+  `use of undeclared identifier 'GenPart_…'`.
+- **Adding a `genInfo` kind to an already-produced process means producing it again.** Flag any
+  diff that widens `genInfo` without saying so.
+- Store the quantities a derived flag is built from, not only the flag, so revisiting a filter
+  definition does not mean going back to nanoAOD.
 
-### Python (Black)
-```bash
-pip install black
-black --check --diff <file.py>
-black <file.py>  # to auto-format
-```
+### Processes and datasets
 
-### YAML (yamllint)
-Configuration: `FLAF/.yamllint`
-```bash
-pip install yamllint
-yamllint -s -c FLAF/.yamllint <file.yaml>
-```
-Key rules:
-- No document start markers required
-- No line length limit
-- 2-space indentation
-- Spaces inside braces/brackets: `{ key: value }`, `[ item ]`
+- Meta processes (`is_meta_process`) expand via `meta_setup.dataset_name_pattern`. A dataset whose
+  name the pattern does not match is **silently ignored** — check that a newly declared dataset
+  is actually captured, and that the captured groups still yield the same `process_name` as the
+  other eras.
+- When one physics point has several datasets (an `_ext1` extension, or a `_LHEweights` variant),
+  the process must carry the `*ext_processors` stitcher (`MCStitcher` with
+  `useDatasetCrossSection`), or the point is normalised once per dataset and counted twice.
+- `Run3_2025` and `Run3_2026` inherit the Run3_2024 MC list. A dataset edited for 2024 changes
+  three eras.
+- 2022–2023BPix read from the HLepRare skim; 2024+ resolve through Rucio/DAS. A dataset that
+  exists in one is not guaranteed in the other.
 
-### C++ (clang-format)
-Configuration: `FLAF/.clang-format`
-```bash
-clang-format --dry-run --Werror --style "file:FLAF/.clang-format" <file.cpp>
-clang-format -i --style "file:FLAF/.clang-format" <file.cpp>  # to auto-format
-```
-Key style: Google-based, 120 column limit, 4-space indent
+### Per-era processor differences are deliberate
 
-## CI/CD Workflows
+t̄t is stitched in 2022–2023BPix and **not** in 2024–2026, and DY→ττ uses `*DYtautau_processors`
+in the first group and plain `*DY_processors` in the second. Do not "harmonise" them in review;
+they follow the samples that exist.
 
-Three GitHub workflows run on PRs:
+### Integration test
 
-1. **`formatting-check.yaml`**: Checks Python/YAML/C++ formatting
-2. **`repo-sanity-checks.yaml`**: Repository size and binary file checks
-3. **`trigger-flaf-integration.yaml`**: Integration tests (manual trigger via comment)
+`TestModel` runs two backgrounds — `custom_CI_Background_TT` and `custom_CI_Background_DY` — plus
+one signal and one data process. **Each CI background must carry the same `processors:` and
+`genInfo:` as the real `TT` / `DYto2Tau_M_50` process of that era**, since its purpose is to run
+the stitching over the whole anaTuple → merge → histogram chain. A diff that changes a real
+process's processors and leaves the CI counterpart behind removes the coverage without any test
+turning red.
 
-**Binary files**: Never commit binary files directly. Use Git LFS for large files.
+One dataset per CI process is enough; do not ask for more, it only makes CI slower.
 
-## Configuration Files
+The process names are also listed in `cms-flaf/FLAF_ci`, a **different repository**. Renaming or
+adding a CI process here needs that updated in step, or every integration run fails with
+`No processes selected in physics model 'TestModel'`.
 
-### Key Configuration Locations
-- **`config/global.yaml`**: Analysis-wide settings (channels, categories, cuts)
-- **`config/law.cfg`**: LAW module definitions for tasks
-- **`config/<ERA>/samples.yaml`**: Dataset samples per era
-- **`config/<ERA>/triggers.yaml`**: Trigger paths per era
-- **`config/user_custom.yaml`**: Local user overrides (gitignored)
+### Jobs must not read from AFS
 
-### Supported Eras
-- Run2: `Run2_2016`, `Run2_2016_HIPM`, `Run2_2017`, `Run2_2018`
-- Run3: `Run3_2022`, `Run3_2022EE`, `Run3_2023`, `Run3_2023BPix`
+Model files and the like must come from the bundled analysis copy (`$ANALYSIS_PATH/...`), not from
+an absolute path into AFS. A few thousand jobs each pulling a model over AFS gets batch submission
+throttled. Note that bundles preserve symlinks verbatim, so a path that *looks* bundled can still
+resolve back to AFS.
 
-## Making Code Changes
+## Documentation must ship with the change
 
-### Python Files (`.py`)
-- Analysis logic in `AnaProd/` and `Analysis/`
-- Use RDataFrame operations for data processing
-- Follow existing patterns for defining variables
-- Key files: `anaTupleDef.py`, `baseline.py`, `hh_bbtautau.py`
+A PR must update the documentation **in the same PR** whenever it changes anything a user of the
+framework can observe. Treat this as a review item of the same weight as correctness — docs
+drifting from the code is the failure that motivated the current documentation, and a PR that
+lands without them is not complete.
 
-### Configuration Files (`.yaml`)
-- Maintain consistent indentation (2 spaces)
-- Use proper YAML list/dict syntax with spaces: `{ key: value }`
-- Validate with yamllint before committing
+Ask, for every diff: does it add, rename or remove any of these?
 
-### C++ Headers (`.h`)
-- Located in `include/` directory
-- Physics algorithm implementations
-- Follow Google C++ style with 4-space indent
+- a task or DAG node, or the arguments/parameters of one;
+- a command, a CLI flag, or the meaning of an existing one;
+- a configuration key — `global.yaml`, `user_custom.yaml`, `processes.yaml`, `phys_models.yaml`,
+  cross-sections, `fs_*` storage keys, bundle flavours, processor entries;
+- a dataset, era, process or physics-model name;
+- the environment, installation or setup steps;
+- storage locations, output paths or log locations;
+- a CI workflow, or how the integration test is triggered or configured;
+- any behaviour a user relies on, including a default that changes.
 
-## Common Analysis Patterns
+If the answer is yes and the diff touches **no** documentation file, say so and name the page that
+should have changed. If the author states the change is internal-only, that is a legitimate
+answer — a pure refactor or bugfix with no user-visible effect is exempt — but it should be
+stated in the PR, not left implicit.
 
-### Channel Definitions
-Channels: `eTau`, `muTau`, `tauTau`, `eE`, `eMu`, `muMu`
+Also flag the inverse: documentation edited to describe behaviour the diff does not implement, and
+new pages added without being wired into `mkdocs.yml`'s `nav` (the build fails on that, but the
+review should catch it first).
 
-### Category Structure
-Categories defined in `config/global.yaml`:
-- `inclusive`, `baseline`, `btag_shape`
-- `res0b_cat3`, `res1b_cat3`, `res2b_cat3` (resolved b-tag categories)
-- `boosted`, `boosted_cat3` (boosted topology)
+Where it goes:
 
-### Adding New Variables
-1. Define in `AnaProd/anaTupleDef.py` for AnaTuple stage
-2. Or in `Analysis/histTupleDef.py` for histogram stage
-3. Add to appropriate observable lists
+- `docs/` in this repository for analysis-specific material (`analysis.md`, `setup.md`, `stat_inference.md`, `hhbtag_training.md`, …).
+- **`FLAF/docs/` for anything framework-wide.** If the change alters shared behaviour, the
+  documentation belongs there, in a companion PR to `cms-flaf/FLAF` — flag that it is missing
+  rather than accepting an analysis-local description of a framework change.
+- New pages must be added to `nav:` in `mkdocs.yml`; verified with `mkdocs build --strict`.
 
-## Submodules
+## Repository facts
 
-The repository depends on several Git submodules:
-- **FLAF**: Core framework (required for all operations)
-- **Corrections**: Physics correction factors
-- **StatInference**: Statistical inference tools
-- **HHKinFit2**, **ClassicSVfit**, **SVfitTF**: Physics algorithms
-- **HHbtag**: HH b-tagging tools
-- **inference**: CERN GitLab inference code
+Verified 2026-08-27; re-check before relying on any of it.
 
-**Note**: Submodules require SSH keys for CERN GitLab and GitHub.
-
-## Important Notes
-
-1. **Do not modify submodule contents** - Changes should go to respective repositories
-2. **User config is gitignored** - `config/user_custom.yaml` for local settings
-3. **Environment requires CMSSW** - Full setup needs CMS software environment
-4. **Test locally before submitting** - Format checks will fail the CI
-
-## Quick Reference
-
-| File Type | Formatter | Config Location |
-|-----------|-----------|-----------------|
-| Python | Black | Default |
-| YAML | yamllint | `FLAF/.yamllint` |
-| C++ | clang-format | `FLAF/.clang-format` |
-
-Trust these instructions. Only search the codebase if information here is incomplete or incorrect.
+| | |
+|---|---|
+| Layout | `AnaProd/` (`anaTupleDef.py`, `baseline.py`, `genProcessInfo.py`), `Analysis/` (`hh_bbtautau.py`, `histTupleDef.py`), `config/`, `include/`, `Studies/`, `test/`, `docs/` |
+| Submodules | `FLAF`, `Corrections`, `StatInference`, `inference`, `HHbtag`, `SyncTool`, `ClassicSVfit`, `SVfitTF`, `HHKinFit2` |
+| Eras | Run 3: 2022, 2022EE, 2023, 2023BPix, 2024, 2025, 2026. Run 2 legacy configs also present |
+| Configs | `config/global.yaml`, `config/processes.yaml` (shared processor anchors), `config/phys_models.yaml`, `config/<era>/{datasets,processes,triggers}.yaml` |
+| Tests | `test/test_gen_process_info.py` (needs `ANALYSIS_PATH` and `FLAF_PATH` set) |
+| Workflows | `formatting-check`, `repo-sanity-checks`, `test-setup-loading`, `deploy-docs`, `trigger-flaf-integration`. Formatting and era loading are checked automatically — do not comment on them |
+| Docs | `docs/`, plus the shared framework docs in `FLAF/docs/`; see the documentation section above |
