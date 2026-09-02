@@ -20,6 +20,7 @@ def Initialize():
         ROOT.gROOT.ProcessLine(f'#include "FLAF/include/Lester_mt2_bisect.cpp"')
         ROOT.gROOT.ProcessLine('#include "FLAF/include/AnalysisTools.h"')
         ROOT.gROOT.ProcessLine('#include "FLAF/include/AnalysisMath.h"')
+        ROOT.gInterpreter.Declare(f'#include "include/LHEVariables.h"')
         initialized = True
 
 
@@ -35,6 +36,7 @@ def GetDfw(df, setup, dataset_name):
     kwargset = {}
 
     kwargset["isData"] = global_params["process_group"] == "data"
+    kwargset["isSignal"] = global_params["process_group"] == "signals"
     kwargset["wantTriggerSFErrors"] = global_params.get("compute_rel_weights", False)
     kwargset["wantScales"] = global_params["compute_unc_variations"]
     kwargset["colToSave"] = []

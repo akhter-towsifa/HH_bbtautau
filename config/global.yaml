@@ -180,9 +180,11 @@ histTuple_flavors:
     # Raw floats needed as DNN training inputs (Analysis/DNN_training/) --
     # saved unbinned/full-precision under fullResolution_variables, and also
     # listed under variables: (binned) per config/plot/histograms.yaml entries
-    # added for this flavor. kinFit_chi2 is the one exception: it's not a
-    # DNN training input (RAW_BRANCHES in data.py), has no histograms.yaml
-    # entry, and stays fullResolution-only.
+    # added for this flavor. kinFit_chi2 is the one exception: it's not a DNN
+    # training input (RAW_BRANCHES in data.py), has no histograms.yaml entry,
+    # and stays fullResolution-only. pthh_lhe/mhh_lhe/costhetastar_lhe are
+    # likewise not DNN training inputs, but do have histograms.yaml entries so
+    # are listed in both.
     fullResolution_variables:
       - event
       - channelId
@@ -231,6 +233,9 @@ histTuple_flavors:
       - Hbb_isValid
       - kinFit_m
       - kinFit_chi2
+      - pthh_lhe
+      - mhh_lhe
+      - costhetastar_lhe
       - weight_base
     variables:
       - event
@@ -279,6 +284,9 @@ histTuple_flavors:
       - met_covYY
       - Hbb_isValid
       - kinFit_m
+      - pthh_lhe
+      - mhh_lhe
+      - costhetastar_lhe
       - weight_base
 
 treeName: "Events"

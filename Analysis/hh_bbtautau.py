@@ -376,6 +376,31 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             if col != "kinFit_result":  # raw C++ struct, not snapshot-able -- see addNewCols()
                 self.colToSave.append(col)
 
+    def defineLHEHHVariables(self):
+        """Gen-level (LHE) di-Higgs kinematics. Only computed from LHEPart_*
+        for HH signal MC (GetDiHiggsP4LHE expects exactly two pdgId==25 LHE
+        particles); other processes and data get a fixed sentinel so these
+        columns always exist -- global.yaml's DNN_training flavor lists them
+        unconditionally, and Snapshot() errors if a listed column is missing
+        from a given dataset's df."""
+        if self.isSignal and not self.isData:
+            self.df = self.df.Define(
+                "pthh_lhe", f"GetPthhLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)"
+            )
+            self.df = self.df.Define(
+                "mhh_lhe", f"GetMhhLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)"
+            )
+            self.df = self.df.Define(
+                "costhetastar_lhe",
+                f"GetCosThetaStarLHE(LHEPart_pt, LHEPart_eta, LHEPart_phi, LHEPart_mass, LHEPart_pdgId)",
+            )
+        else:
+            self.df = self.df.Define("pthh_lhe", "-1.f")
+            self.df = self.df.Define("mhh_lhe", "-1.f")
+            self.df = self.df.Define("costhetastar_lhe", "-2.f")
+        for col in ("pthh_lhe", "mhh_lhe", "costhetastar_lhe"):
+            self.colToSave.append(col)
+
     def defineTriggers(self):
         for ch in self.config["channelSelection"]:
             for trg in self.config["triggers"][ch]:
@@ -673,6 +698,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         pNetWPstring="Loose",
         region="SR",
         isData=False,
+        isSignal=False,
         isCentral=False,
         wantTriggerSFErrors=False,
         whichType=3,
@@ -689,6 +715,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.period = period
         self.region = region
         self.isData = isData
+        self.isSignal = isSignal
         self.whichType = whichType
         self.isCentral = isCentral
         self.wantTriggerSFErrors = wantTriggerSFErrors
@@ -715,9 +742,23 @@ def PrepareDfForHistograms(dfForHistograms):
 
     dfForHistograms.df = defineAllP4(dfForHistograms.df, isData=dfForHistograms.isData)
 
+    if dfForHistograms.isData:
+        # weight_base is an MC-only AnaTuple branch (per-event cross-section-
+        # normalized weight, written by AnaTupleMergeTask) -- data has no such
+        # branch. histTuple_flavors.DNN_training (config/global.yaml) lists
+        # weight_base as both a fullResolution_variable and a binned variable,
+        # so without this the "data" dataset fails JIT compilation with
+        # "use of undeclared identifier 'weight_base'" the moment
+        # HistTupleProducer.py tries to bin it. Data is never used for DNN
+        # training (Analysis/DNN_training/config.py CLASSES has no "data"
+        # entry), so a dummy value here is safe -- it exists only so the
+        # column-save/binning machinery doesn't crash on data.
+        dfForHistograms.df = dfForHistograms.df.Define("weight_base", "1.")
+
     dfForHistograms.defineTriggers()
     dfForHistograms.defineBoostedVariables()
     dfForHistograms.defineKinFit()
+    dfForHistograms.defineLHEHHVariables()
     dfForHistograms.redefinePUJetIDWeights()
     dfForHistograms.df = createInvMass(dfForHistograms.df)
     dfForHistograms.defineChannels()
