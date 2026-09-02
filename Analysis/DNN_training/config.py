@@ -132,6 +132,24 @@ class KFoldConfig:
     split_seed: int = 42
 
 
+def _default_config_dir() -> str:
+    """ANALYSIS_PATH (set by env.sh) takes priority when running inside the
+    FLAF/CMSSW environment, matching DNN_application.py's own convention.
+    Standalone (e.g. a GPU node with just this package's own repo checked
+    out, no FLAF, ANALYSIS_PATH unset) falls back to the repo's own config/
+    directory, found relative to this file's location rather than the
+    caller's cwd -- this file lives at <repo_root>/Analysis/DNN_training/
+    config.py, so config/ is two levels up. Keep that relative layout (this
+    package's directory structure, plus a top-level config/{era}/processes.yaml
+    tree) if extracting this code into a standalone repo, so this fallback
+    keeps working unchanged there too."""
+    ana_path = os.environ.get("ANALYSIS_PATH")
+    if ana_path:
+        return os.path.join(ana_path, "config")
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    return os.path.join(repo_root, "config")
+
+
 @dataclass
 class DataConfig:
     # local/EOS directory containing HistTupleProducerTask output (produced with
@@ -139,14 +157,10 @@ class DataConfig:
     # holding "HistTuples/{era}/{dataset}/histTuple_*.root".
     data_root: str = ""
     eras: list[str] = field(default_factory=lambda: list(ERAS))
-    # Absolute by default (via ANALYSIS_PATH, set by env.sh to the bbtautau/
-    # checkout root -- same variable DNN_application.py itself relies on), so
-    # this doesn't silently break depending on the caller's cwd the way a
-    # plain relative "bbtautau/config" string would. Holds
-    # {era}/{datasets,processes}.yaml.
-    config_dir: str = field(
-        default_factory=lambda: os.path.join(os.environ.get("ANALYSIS_PATH", "bbtautau"), "config")
-    )
+    # Holds {era}/processes.yaml (used by resolve_class_datasets() in data.py)
+    # plus the shared top-level processes.yaml it aliases into. See
+    # _default_config_dir() for how the default is resolved.
+    config_dir: str = field(default_factory=_default_config_dir)
     batch_size: int = 4096
     class_weights: dict[str, float] = field(
         default_factory=lambda: {c: 1.0 / len(CLASSES) for c in CLASSES}

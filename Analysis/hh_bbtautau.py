@@ -731,6 +731,19 @@ def PrepareDfForHistograms(dfForHistograms):
 
     dfForHistograms.df = defineAllP4(dfForHistograms.df, isData=dfForHistograms.isData)
 
+    if dfForHistograms.isData:
+        # weight_base is an MC-only AnaTuple branch (per-event cross-section-
+        # normalized weight, written by AnaTupleMergeTask) -- data has no such
+        # branch. histTuple_flavors.DNN_training (config/global.yaml) lists
+        # weight_base as both a fullResolution_variable and a binned variable,
+        # so without this the "data" dataset fails JIT compilation with
+        # "use of undeclared identifier 'weight_base'" the moment
+        # HistTupleProducer.py tries to bin it. Data is never used for DNN
+        # training (Analysis/DNN_training/config.py CLASSES has no "data"
+        # entry), so a dummy value here is safe -- it exists only so the
+        # column-save/binning machinery doesn't crash on data.
+        dfForHistograms.df = dfForHistograms.df.Define("weight_base", "1.")
+
     dfForHistograms.defineTriggers()
     dfForHistograms.defineBoostedVariables()
     dfForHistograms.defineLHEHHVariables()
