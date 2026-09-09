@@ -2,3 +2,4 @@
 *.pb filter=lfs diff=lfs merge=lfs -text
 config/nn_models/model_fold*_moe/variables/* filter=lfs diff=lfs merge=lfs -text
 config/nn_models/**/variables/* filter=lfs diff=lfs merge=lfs -text
+config/nn_models/ggf_pytorch*/**/*.pt filter=lfs diff=lfs merge=lfs -text

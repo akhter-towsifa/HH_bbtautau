@@ -1,5 +1,5 @@
 import os
-from .Utilities import *
+from FLAF.Common.Utilities import *
 
 initialized = False
 
@@ -15,6 +15,12 @@ def Initialize(load_kinfit=True, load_svfit=True, load_mt2=True):
         raise RuntimeError("Legacy variables are already initialized")
     headers_to_include = ["FLAF/include/AnalysisTools.h"]
     if load_kinfit:
+        kinfit_lib = os.path.join(
+            os.environ["ANALYSIS_PATH"], "HHKinFit2", "libHHKinFit2.so"
+        )
+        load_result = ROOT.gSystem.Load(kinfit_lib)
+        if load_result != 0:
+            raise RuntimeError(f"Failed to load {kinfit_lib}, status {load_result}")
         headers_to_include += ["include/KinFitInterface.h"]
     if load_svfit:
         headers_to_include += ["include/SVfitAnaInterface.h"]
