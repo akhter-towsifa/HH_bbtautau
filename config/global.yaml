@@ -176,6 +176,29 @@ histTuple_flavors:
     variables:
       - tau1_pt
       - ggF_DNN_HH
+  DNN_comparison:
+    # For comparing the central (TF) ggF_DNN against the standalone-trained
+    # PyTorch variants (full model vs. kinFit_m-region-routed combined model)
+    # via S/sqrt(B) in kinFit_m regions -- see payload_producers.ggF_DNN,
+    # ggF_DNN_pytorch_full, ggF_DNN_pytorch_combined_kinFit above.
+    fullResolution_variables: [ ]
+    variables:
+      - kinFit_m
+      - kinFit_chi2
+      - kinFit_convergence
+      - ggF_DNN_HH
+      - ggF_DNN_TT
+      - ggF_DNN_DY
+      - ggF_DNN_pytorch_full_HH
+      - ggF_DNN_pytorch_full_TT
+      - ggF_DNN_pytorch_full_DY
+      - ggF_DNN_pytorch_full_SingleH
+      - ggF_DNN_pytorch_full_ST
+      - ggF_DNN_pytorch_combined_kinFit_HH
+      - ggF_DNN_pytorch_combined_kinFit_TT
+      - ggF_DNN_pytorch_combined_kinFit_DY
+      - ggF_DNN_pytorch_combined_kinFit_SingleH
+      - ggF_DNN_pytorch_combined_kinFit_ST
 
 treeName: "Events"
 
@@ -675,3 +698,156 @@ payload_producers:
       - Signal
       - TT
       - DY
+
+  ggF_DNN_pytorch_full:
+    producers_module_name: Analysis.DNN_application_pytorch
+    producer_name: PyTorchDNNProducer
+    channels:
+      - eTau
+      - muTau
+      - tauTau
+    dependencies:
+    model_dir: "config/nn_models/ggf_pytorch/"
+    version: "model_fold{}_moe"
+    features:
+      - luminosityBlock
+      - run
+      - event
+      - tau1_pt
+      - tau1_eta
+      - tau1_phi
+      - tau1_mass
+      - tau1_decayMode
+      - tau1_charge
+      - tau2_pt
+      - tau2_eta
+      - tau2_phi
+      - tau2_mass
+      - tau2_decayMode
+      - tau2_charge
+      - b1_pt
+      - b1_eta
+      - b1_phi
+      - b1_mass
+      - b1_btagDeepFlavB
+      - b1_btagPNetCvB
+      - b1_btagPNetCvL
+      - b1_HHbtag
+      - b2_pt
+      - b2_eta
+      - b2_phi
+      - b2_mass
+      - b2_btagDeepFlavB
+      - b2_btagPNetCvB
+      - b2_btagPNetCvL
+      - b2_HHbtag
+      - SelectedFatJet_pt_boosted
+      - SelectedFatJet_eta_boosted
+      - SelectedFatJet_phi_boosted
+      - SelectedFatJet_mass_boosted
+      - met_pt
+      - met_phi
+      - met_covXX
+      - met_covXY
+      - met_covYY
+      - Hbb_isValid
+      - boosted_baseline
+      - channelId
+    columns: # don't change the order of those columns
+      - HH
+      - TT
+      - DY
+      - SingleH
+      - ST
+    n_cpus: 4
+    max_runtime: 8.0
+    cmssw_env: False
+    awkward_based: True
+    uproot_stepsize: '50MB'
+    class_names:
+      - Signal
+      - TT
+      - DY
+      - SingleH
+      - ST
+
+  ggF_DNN_pytorch_combined_kinFit:
+    producers_module_name: Analysis.DNN_application_pytorch
+    producer_name: PyTorchRegionRoutedDNNProducer
+    channels:
+      - eTau
+      - muTau
+      - tauTau
+    dependencies:
+    version: "model_fold{}_moe"
+    regions:
+      - name: low
+        kinFit_m_max: 350
+        model_dir: "config/nn_models/ggf_pytorch_low/"
+      - name: high
+        kinFit_m_min: 350
+        model_dir: "config/nn_models/ggf_pytorch_high/"
+      # future: add more entries here to add more kinFit_m-region splits
+    features:
+      - luminosityBlock
+      - run
+      - event
+      - tau1_pt
+      - tau1_eta
+      - tau1_phi
+      - tau1_mass
+      - tau1_decayMode
+      - tau1_charge
+      - tau2_pt
+      - tau2_eta
+      - tau2_phi
+      - tau2_mass
+      - tau2_decayMode
+      - tau2_charge
+      - b1_pt
+      - b1_eta
+      - b1_phi
+      - b1_mass
+      - b1_btagDeepFlavB
+      - b1_btagPNetCvB
+      - b1_btagPNetCvL
+      - b1_HHbtag
+      - b2_pt
+      - b2_eta
+      - b2_phi
+      - b2_mass
+      - b2_btagDeepFlavB
+      - b2_btagPNetCvB
+      - b2_btagPNetCvL
+      - b2_HHbtag
+      - SelectedFatJet_pt_boosted
+      - SelectedFatJet_eta_boosted
+      - SelectedFatJet_phi_boosted
+      - SelectedFatJet_mass_boosted
+      - met_pt
+      - met_phi
+      - met_covXX
+      - met_covXY
+      - met_covYY
+      - Hbb_isValid
+      - boosted_baseline
+      - channelId
+      - kinFit_m
+      - kinFit_convergence
+    columns: # don't change the order of those columns
+      - HH
+      - TT
+      - DY
+      - SingleH
+      - ST
+    n_cpus: 4
+    max_runtime: 8.0
+    cmssw_env: False
+    awkward_based: True
+    uproot_stepsize: '50MB'
+    class_names:
+      - Signal
+      - TT
+      - DY
+      - SingleH
+      - ST
