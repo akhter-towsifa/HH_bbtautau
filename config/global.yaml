@@ -181,14 +181,49 @@ histTuple_flavors:
     # PyTorch variants (full model vs. kinFit_m-region-routed combined model)
     # via S/sqrt(B) in kinFit_m regions -- see payload_producers.ggF_DNN,
     # ggF_DNN_pytorch_full, ggF_DNN_pytorch_combined_kinFit above.
-    fullResolution_variables: [ ]
-    variables:
+    #
+    # kinFit_m/kinFit_chi2/kinFit_convergence are plain hh_bbtautau.py Define()s
+    # (always present, no producer/cache needed), so fullResolution_variables
+    # alone is enough for them.
+    #
+    # The ggF_DNN_pytorch_* columns are producer-derived: FLAF.Common.Setup's
+    # var_producer_map/histTuple_vars union (used by
+    # HistTupleProducerTask.workflow_requires() to decide which
+    # AnalysisCacheTask to require) is only ever populated from
+    # histTuple_plot_vars (this "variables:" list) due to a copy-paste bug in
+    # Setup.py (its fullresvar_dict loop iterates histTuple_plot_vars again
+    # instead of histTuple_fullres_vars) -- so a producer column listed only
+    # under fullResolution_variables never gets its AnalysisCacheTask
+    # requested/friended in at all. They therefore have to be listed under
+    # variables: too, purely to trigger that dependency; config/plot/
+    # histograms.yaml now has matching x_bins entries for all ten so
+    # DefineBinnedColumn (FLAF/Analysis/HistTupleProducer.py) doesn't raise a
+    # KeyError, but that path only saves a "{var}_bin" bin-index column, not
+    # the raw score -- fullResolution_variables (below) still carries the
+    # actual value, which is what we want for an exact-value S/sqrt(B)
+    # comparison. The "{var}_bin" columns end up in the output too; harmless,
+    # just ignore them.
+    fullResolution_variables:
       - kinFit_m
       - kinFit_chi2
       - kinFit_convergence
-      - ggF_DNN_HH
-      - ggF_DNN_TT
-      - ggF_DNN_DY
+      # - ggF_DNN_HH
+      # - ggF_DNN_TT
+      # - ggF_DNN_DY
+      - ggF_DNN_pytorch_full_HH
+      - ggF_DNN_pytorch_full_TT
+      - ggF_DNN_pytorch_full_DY
+      - ggF_DNN_pytorch_full_SingleH
+      - ggF_DNN_pytorch_full_ST
+      - ggF_DNN_pytorch_combined_kinFit_HH
+      - ggF_DNN_pytorch_combined_kinFit_TT
+      - ggF_DNN_pytorch_combined_kinFit_DY
+      - ggF_DNN_pytorch_combined_kinFit_SingleH
+      - ggF_DNN_pytorch_combined_kinFit_ST
+    variables:
+      # - ggF_DNN_HH
+      # - ggF_DNN_TT
+      # - ggF_DNN_DY
       - ggF_DNN_pytorch_full_HH
       - ggF_DNN_pytorch_full_TT
       - ggF_DNN_pytorch_full_DY
