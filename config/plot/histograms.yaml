@@ -1039,3 +1039,91 @@ costhetastar_lhe:
   use_log_y: False
   max_y_sf: 1.8
   divide_by_bin_width: False
+
+# ggF_DNN_pytorch_full_*/ggF_DNN_pytorch_combined_kinFit_* are softmax class
+# probabilities in [0,1], same nature as ggF_DNN_HH above -- entries needed
+# so HistTupleProducerTask's DefineBinnedColumn (FLAF/Analysis/HistTupleProducer.py)
+# has a binning to JIT-compile for them; they're listed under
+# histTuple_flavors.DNN_comparison.variables (config/global.yaml) purely to
+# get their AnalysisCacheTask dependency resolved, with the actual raw score
+# saved via fullResolution_variables instead of the "{var}_bin" index this
+# binning produces.
+ggF_DNN_pytorch_full_HH:
+  x_bins: "100|0:1"
+  x_title: ggF DNN (PyTorch, full) HH
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+ggF_DNN_pytorch_full_TT:
+  x_bins: "100|0:1"
+  x_title: ggF DNN (PyTorch, full) TT
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+ggF_DNN_pytorch_full_DY:
+  x_bins: "100|0:1"
+  x_title: ggF DNN (PyTorch, full) DY
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+ggF_DNN_pytorch_full_SingleH:
+  x_bins: "100|0:1"
+  x_title: ggF DNN (PyTorch, full) SingleH
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+ggF_DNN_pytorch_full_ST:
+  x_bins: "100|0:1"
+  x_title: ggF DNN (PyTorch, full) ST
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+ggF_DNN_pytorch_combined_kinFit_HH:
+  x_bins: "100|0:1"
+  x_title: ggF DNN (PyTorch, combined kinFit) HH
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+ggF_DNN_pytorch_combined_kinFit_TT:
+  x_bins: "100|0:1"
+  x_title: ggF DNN (PyTorch, combined kinFit) TT
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+ggF_DNN_pytorch_combined_kinFit_DY:
+  x_bins: "100|0:1"
+  x_title: ggF DNN (PyTorch, combined kinFit) DY
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+ggF_DNN_pytorch_combined_kinFit_SingleH:
+  x_bins: "100|0:1"
+  x_title: ggF DNN (PyTorch, combined kinFit) SingleH
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+ggF_DNN_pytorch_combined_kinFit_ST:
+  x_bins: "100|0:1"
+  x_title: ggF DNN (PyTorch, combined kinFit) ST
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
