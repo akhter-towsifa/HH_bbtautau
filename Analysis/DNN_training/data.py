@@ -339,6 +339,21 @@ def build_features(array, period: str) -> tuple[dict[str, np.ndarray], np.ndarra
     cat_inputs = {}
     for name in CATEGORICAL_SPECS:
         raw_values = np.asarray(f[name])
+        if name in ("dau1_dm", "dau2_dm"):
+            # TEMPORARY stopgap, remove once retrained: HPS decay mode 2
+            # (1-prong + 2pi0) is a real, valid decay mode but is missing from
+            # CATEGORICAL_SPECS[name] -- it's rare enough that it wasn't seen
+            # in the HH-signal training sample, but shows up on high-stat
+            # backgrounds/data (e.g. TTtoLNu2Q), where index_maps[name].get()
+            # returned None and crashed np.vectorize's int64 cast. Remapping
+            # it to decay mode 1 (1-prong + 1pi0, the closest existing
+            # category) avoids retraining/reshaping the already-deployed
+            # embedding tables (adding "2" to CATEGORICAL_SPECS changes
+            # nn.Embedding cardinality, which breaks loading the current
+            # checkpoints -- see the fold model dimensions in model.py).
+            # Once retrained with "2" included in CATEGORICAL_SPECS, delete
+            # this remap.
+            raw_values = np.where(raw_values == 2, 1, raw_values)
         cat_inputs[name] = np.vectorize(index_maps[name].get)(raw_values).astype(np.int64)
 
     lbn_vectors = np.stack(
