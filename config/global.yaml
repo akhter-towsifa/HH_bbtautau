@@ -278,7 +278,16 @@ histTuple_flavors:
       - ggF_DNN_pytorch_combined_kinFit_DY
       - ggF_DNN_pytorch_combined_kinFit_SingleH
       - ggF_DNN_pytorch_combined_kinFit_ST
+      - event
+      - run
+      - luminosityBlock
+      - mhh_lhe
+      - pthh_lhe
+      - costhetastar_lhe
     variables:
+      - kinFit_m
+      - kinFit_chi2
+      - kinFit_convergence
       # - ggF_DNN_HH
       # - ggF_DNN_TT
       # - ggF_DNN_DY
@@ -292,6 +301,12 @@ histTuple_flavors:
       - ggF_DNN_pytorch_combined_kinFit_DY
       - ggF_DNN_pytorch_combined_kinFit_SingleH
       - ggF_DNN_pytorch_combined_kinFit_ST
+      - event
+      - run
+      - luminosityBlock
+      - mhh_lhe
+      - pthh_lhe
+      - costhetastar_lhe
 
 treeName: "Events"
 

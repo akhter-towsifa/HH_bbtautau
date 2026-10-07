@@ -917,6 +917,22 @@ kinFit_m:
   use_log_x: True
   blind_ranges: [ 250, 3500 ]
 
+kinFit_chi2:
+  x_bins: "100|0:100"
+  x_title: \chi^{2}_{kinfit}
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+kinFit_convergence:
+  x_bins: "2|0:2"
+  x_title: kinFit convergence
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
 MT2:
   x_bins: "50|0:500"
   x_title: M_{T2}
