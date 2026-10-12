@@ -6,7 +6,6 @@ if __name__ == "__main__":
 from FLAF.Common.HistHelper import *
 from Analysis.GetCrossWeights import *
 from Corrections.Corrections import Corrections
-import AnaProd.LegacyVariables as LegacyVariables
 
 # from Analysis.GetTauTauWeights import *
 from FLAF.Common.Utilities import *
@@ -392,17 +391,6 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         for col in ("pthh_lhe", "mhh_lhe", "costhetastar_lhe"):
             self.colToSave.append(col)
 
-    def defineKinFit(self):  # needs p4 def
-        """HHKinFit2-based kinematic fit mass (kinFit_m) and its diagnostics (kinFit_chi2, kinFit_convergence)."""
-        if not LegacyVariables.initialized:
-            LegacyVariables.Initialize(load_kinfit=True, load_svfit=False, load_mt2=False)
-        if "entry_valid" not in self.df.GetColumnNames():
-            self.df = self.df.Define("entry_valid", "Hbb_isValid")
-        self.df, kinfit_cols = LegacyVariables.GetKinFit(self.df)
-        for col in kinfit_cols:
-            if col != "kinFit_result":
-                self.colToSave.append(col)
-
     def defineTriggers(self):
         for ch in self.config["channelSelection"]:
             for trg in self.config["triggers"][ch]:
@@ -743,7 +731,6 @@ def PrepareDfForHistograms(dfForHistograms):
     dfForHistograms.defineTriggers()
     dfForHistograms.defineBoostedVariables()
     dfForHistograms.defineLHEHHVariables()
-    dfForHistograms.defineKinFit()
     dfForHistograms.redefinePUJetIDWeights()
     dfForHistograms.df = createInvMass(dfForHistograms.df)
     dfForHistograms.defineChannels()

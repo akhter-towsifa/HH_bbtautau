@@ -240,11 +240,15 @@ histTuple_flavors:
     # via S/sqrt(B) in kinFit_m regions -- see payload_producers.ggF_DNN,
     # ggF_DNN_pytorch_full, ggF_DNN_pytorch_combined_kinFit above.
     #
-    # kinFit_m/kinFit_chi2/kinFit_convergence are plain hh_bbtautau.py Define()s
-    # (always present, no producer/cache needed), so fullResolution_variables
-    # alone is enough for them.
+    # kinFit_m/kinFit_chi2/kinFit_convergence are now ALSO producer-derived
+    # (payload_producers.kinFit, Analysis/KinFitProducer.py -- moved off of
+    # hh_bbtautau.py's old unconditional defineKinFit() so the HHKinFit2 fit
+    # is computed once via AnalysisCacheTask instead of redundantly inside
+    # every AnalysisCacheTask producer run and HistTupleProducerTask), so the
+    # same reasoning below for the ggF_DNN_pytorch_* columns now applies to
+    # all 13 columns in this flavor uniformly.
     #
-    # The ggF_DNN_pytorch_* columns are producer-derived: FLAF.Common.Setup's
+    # All of them are producer-derived: FLAF.Common.Setup's
     # var_producer_map/histTuple_vars union (used by
     # HistTupleProducerTask.workflow_requires() to decide which
     # AnalysisCacheTask to require) is only ever populated from
@@ -254,13 +258,14 @@ histTuple_flavors:
     # under fullResolution_variables never gets its AnalysisCacheTask
     # requested/friended in at all. They therefore have to be listed under
     # variables: too, purely to trigger that dependency; config/plot/
-    # histograms.yaml now has matching x_bins entries for all ten so
-    # DefineBinnedColumn (FLAF/Analysis/HistTupleProducer.py) doesn't raise a
-    # KeyError, but that path only saves a "{var}_bin" bin-index column, not
-    # the raw score -- fullResolution_variables (below) still carries the
-    # actual value, which is what we want for an exact-value S/sqrt(B)
-    # comparison. The "{var}_bin" columns end up in the output too; harmless,
-    # just ignore them.
+    # histograms.yaml already has matching x_bins entries for all 13 (kinFit_m
+    # et al. had them already; the ten ggF_DNN_pytorch_* ones were added
+    # alongside) so DefineBinnedColumn (FLAF/Analysis/HistTupleProducer.py)
+    # doesn't raise a KeyError, but that path only saves a "{var}_bin"
+    # bin-index column, not the raw score -- fullResolution_variables (below)
+    # still carries the actual value, which is what we want for an
+    # exact-value S/sqrt(B) comparison. The "{var}_bin" columns end up in the
+    # output too; harmless, just ignore them.
     fullResolution_variables:
       - kinFit_m
       - kinFit_chi2
@@ -876,6 +881,25 @@ payload_producers:
       - SingleH
       - ST
 
+  kinFit:
+    # HHKinFit2-based kinematic fit (Analysis/KinFitProducer.py, wrapping
+    # AnaProd/LegacyVariables.py::GetKinFit()). All real work happens in
+    # prepare_dfw() at the RDataFrame level -- no features:/model_dir: needed,
+    # it uses whatever's already on the dataframe it's handed (raw tau1/tau2/
+    # b1/b2/MET branches + Hbb_isValid, all present from AnaTuple production).
+    # columns: [m, chi2, convergence] -> output columns kinFit_m, kinFit_chi2,
+    # kinFit_convergence (GetKinFit() already defines them under those exact
+    # native names, so run() is a pure pass-through).
+    producers_module_name: Analysis.KinFitProducer
+    producer_name: KinFitProducer
+    columns: [m, chi2, convergence]
+    dependencies:
+    n_cpus: 4
+    max_runtime: 8.0
+    cmssw_env: False
+    awkward_based: True
+    uproot_stepsize: '50MB'
+
   ggF_DNN_pytorch_combined_kinFit:
     producers_module_name: Analysis.DNN_application_pytorch
     producer_name: PyTorchRegionRoutedDNNProducer
@@ -883,6 +907,14 @@ payload_producers:
       - eTau
       - muTau
       - tauTau
+    # Not chained onto payload_producers.kinFit via dependencies: -- that
+    # inter-producer path hits a FLAF bug (AnalysisCacheTask.requires(),
+    # FLAF/Analysis/tasks.py:1130-1133, doesn't pin branch/branches the way
+    # the working HistTupleProducerTask.requires() does at lines 215-222, so
+    # self.input()["anaCaches"][dep] resolves to a bare target instead of
+    # something indexable). PyTorchRegionRoutedDNNProducer.prepare_dfw()
+    # computes kinFit_m/kinFit_convergence itself instead (see
+    # Analysis/DNN_application_pytorch.py) -- no dependency needed.
     dependencies:
     version: "model_fold{}_moe"
     regions:

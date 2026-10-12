@@ -3,6 +3,7 @@ import os
 import numpy as np
 import torch
 
+import AnaProd.LegacyVariables as LegacyVariables
 from Analysis.DNN_training.config import CLASSES, ModelConfig, categorical_cardinalities
 from Analysis.DNN_training.model import Ensemble, GGFClassifier
 from Analysis.DNN_training.data import build_features
@@ -199,8 +200,28 @@ class PyTorchRegionRoutedDNNProducer:
         if bounds[-1][1] != np.inf:
             raise ValueError("regions must cover kinFit_m up to +inf")
 
-    def prepare_dfw(self, rdf, dataset):
-        return rdf
+    def prepare_dfw(self, dfw, dataset):
+        # kinFit_m/kinFit_convergence are needed here for region routing (see
+        # ApplyDNN below), but are no longer computed unconditionally upstream
+        # (Analysis/hh_bbtautau.py's old defineKinFit() was removed in favor
+        # of the dedicated "kinFit" AnalysisCacheTask producer). Chaining onto
+        # that producer's cache via payload_producers.<name>.dependencies hits
+        # a FLAF bug (AnalysisCacheTask.requires()'s inter-producer dependency
+        # path builds its anaCaches entry without pinning branch/branches the
+        # way the working HistTupleProducerTask.requires() does, so
+        # self.input()["anaCaches"][dep] resolves to a bare target instead of
+        # something indexable -- FLAF/Analysis/tasks.py:1130-1133 vs. 215-222).
+        # Routing around it: compute kinFit inline here instead, exactly like
+        # KinFitProducer does -- this duplicates the HHKinFit2 fit for this
+        # one producer only (not every producer, as before this refactor),
+        # and needs no inter-producer dependency at all.
+        if "kinFit_m" not in dfw.df.GetColumnNames():
+            if not LegacyVariables.initialized:
+                LegacyVariables.Initialize(load_kinfit=True, load_svfit=False, load_mt2=False)
+            if "entry_valid" not in dfw.df.GetColumnNames():
+                dfw.df = dfw.df.Define("entry_valid", "Hbb_isValid")
+            dfw.df, _ = LegacyVariables.GetKinFit(dfw.df)
+        return dfw
 
     def run(self, array):
         array = self.ApplyDNN(array)
