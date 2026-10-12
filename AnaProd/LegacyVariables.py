@@ -1,7 +1,50 @@
 import os
+import subprocess
 from FLAF.Common.Utilities import *
 
 initialized = False
+
+
+def _setup_kinfit_runtime(analysis_path):
+    """One-time HHKinFit2 standalone-build setup, done lazily here (not in
+    env.sh) so it only happens -- and is only required to succeed -- when
+    kinFit is actually used. Other tasks/workflows that never call
+    Initialize(load_kinfit=True) never pay this cost and never depend on
+    HHKinFit2 building successfully.
+
+    Mirrors apply_cmssw_customization_steps() in env.sh (which only runs
+    during a fresh CMSSW install, for scram's benefit, inside the CMSSW
+    src/ tree) -- the Python-side header declare below resolves
+    "HHKinFit2/HHKinFit2/interface/..." via cling's ".include $ANALYSIS_PATH"
+    directive, so it needs the same symlinks at $ANALYSIS_PATH root too.
+
+    The CMSSW-built lib (soft/$FLAF_CMSSW_VERSION/lib/.../libHHKinFit2HHKinFit2.so)
+    is compiled against CMSSW's bundled ROOT, not flaf_env's -- different
+    ROOT builds aren't ABI-compatible ("TUnixSystem::Load: version
+    mismatch") -- so a standalone lib is built against whatever ROOT is
+    active here instead. Remove HHKinFit2/libHHKinFit2.so to force a
+    rebuild after a flaf_env/ROOT version bump.
+    """
+    hhkinfit_link = os.path.join(analysis_path, "HHKinFit2", "HHKinFit2")
+    if not os.path.exists(hhkinfit_link):
+        os.makedirs(os.path.join(analysis_path, "HHTools"), exist_ok=True)
+        os.makedirs(os.path.join(analysis_path, "TauAnalysis"), exist_ok=True)
+        for target, link in (
+            (os.path.join(analysis_path, "HHbtag"), os.path.join(analysis_path, "HHTools", "HHbtag")),
+            (os.path.join(analysis_path, "ClassicSVfit"), os.path.join(analysis_path, "TauAnalysis", "ClassicSVfit")),
+            (os.path.join(analysis_path, "SVfitTF"), os.path.join(analysis_path, "TauAnalysis", "SVfitTF")),
+            (os.path.join(analysis_path, "HHKinFit2"), hhkinfit_link),
+        ):
+            if not os.path.exists(link):
+                os.symlink(target, link)
+
+    kinfit_lib = os.path.join(analysis_path, "HHKinFit2", "libHHKinFit2.so")
+    if not os.path.isfile(kinfit_lib):
+        print(f"Building standalone {kinfit_lib} against the active ROOT...")
+        result = subprocess.run(["bash", "compile.sh"], cwd=os.path.join(analysis_path, "HHKinFit2"))
+        if result.returncode != 0:
+            raise RuntimeError(f"Failed to build {kinfit_lib}")
+    return kinfit_lib
 
 
 def Initialize(load_kinfit=True, load_svfit=True, load_mt2=True):
@@ -15,9 +58,7 @@ def Initialize(load_kinfit=True, load_svfit=True, load_mt2=True):
         raise RuntimeError("Legacy variables are already initialized")
     headers_to_include = ["FLAF/include/AnalysisTools.h"]
     if load_kinfit:
-        kinfit_lib = os.path.join(
-            os.environ["ANALYSIS_PATH"], "HHKinFit2", "libHHKinFit2.so"
-        )
+        kinfit_lib = _setup_kinfit_runtime(os.environ["ANALYSIS_PATH"])
         load_result = ROOT.gSystem.Load(kinfit_lib)
         if load_result != 0:
             raise RuntimeError(f"Failed to load {kinfit_lib}, status {load_result}")
