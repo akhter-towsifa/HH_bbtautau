@@ -270,9 +270,9 @@ histTuple_flavors:
       - kinFit_m
       - kinFit_chi2
       - kinFit_convergence
-      # - ggF_DNN_HH
-      # - ggF_DNN_TT
-      # - ggF_DNN_DY
+      - ggF_DNN_HH
+      - ggF_DNN_TT
+      - ggF_DNN_DY
       - ggF_DNN_pytorch_full_HH
       - ggF_DNN_pytorch_full_TT
       - ggF_DNN_pytorch_full_DY
@@ -293,9 +293,9 @@ histTuple_flavors:
       - kinFit_m
       - kinFit_chi2
       - kinFit_convergence
-      # - ggF_DNN_HH
-      # - ggF_DNN_TT
-      # - ggF_DNN_DY
+      - ggF_DNN_HH
+      - ggF_DNN_TT
+      - ggF_DNN_DY
       - ggF_DNN_pytorch_full_HH
       - ggF_DNN_pytorch_full_TT
       - ggF_DNN_pytorch_full_DY
