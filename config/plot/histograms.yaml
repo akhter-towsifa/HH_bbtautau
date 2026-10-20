@@ -1032,6 +1032,24 @@ ggF_DNN_HH:
   max_y_sf: 1.8
   divide_by_bin_width: False
 
+ggF_DNN_TT:
+  x_bins: "100|0:1"
+  x_title: ggF DNN TT
+  # y_title: dN/dm (1/GeV)
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
+ggF_DNN_DY:
+  x_bins: "100|0:1"
+  x_title: ggF DNN DY
+  # y_title: dN/dm (1/GeV)
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.8
+  divide_by_bin_width: False
+
 pthh_lhe:
   x_bins: "60|0:600"
   x_title: p_{T}^{HH} (GeV, gen LHE)

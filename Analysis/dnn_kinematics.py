@@ -81,8 +81,22 @@ def convert_to_numpy(event_data, period, mass, spin):
         #     Era[period].value,
         # ),
         "pair_type": np.array(event_data["channelId"]),
-        "dau1_dm": np.array(event_data["tau1_decayMode"]),
-        "dau2_dm": np.array(event_data["tau2_decayMode"]),
+        # TEMPORARY stopgap, remove once retrained: HPS decay mode 2 (1-prong
+        # + 2pi0) is missing from this TF ggF_DNN model's own category
+        # vocabulary -- its internal lookup falls through to -1 for it, which
+        # then fails embedding_lookup's bounds check. Same gap, same fix as
+        # the PyTorch model's CATEGORICAL_SPECS remap (Analysis/DNN_training/
+        # data.py); remap to the closest existing category (1).
+        "dau1_dm": np.where(
+            np.array(event_data["tau1_decayMode"]) == 2,
+            1,
+            event_data["tau1_decayMode"],
+        ),
+        "dau2_dm": np.where(
+            np.array(event_data["tau2_decayMode"]) == 2,
+            1,
+            event_data["tau2_decayMode"],
+        ),
         "dau1_charge": np.array(event_data["tau1_charge"]),
         "dau2_charge": np.array(event_data["tau2_charge"]),
         "is_boosted": np.array(event_data["boosted_baseline"]),
