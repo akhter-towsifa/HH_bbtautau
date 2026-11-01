@@ -241,7 +241,6 @@ histTuple_flavors:
       - luminosityBlock
       - mhh_lhe
       - pthh_lhe
-      - costhetastar_lhe
     variables:
       - ggF_DNN_HH
       - ggF_DNN_TT
@@ -677,10 +676,13 @@ unc_to_not_consider_boosted:
   - bTagShapeSF_cferr1
   - bTagShapeSF_cferr2
 
+# Off by default: the trees need run/event/luminosityBlock in the HistTuples, which only the
+# DNN_ELReweighter (and CI) flavors keep. Enable it together with that flavor
 signal_tree_hists_ELReweighter:
-  store_signal_trees: true
+  store_signal_trees: false
   vars_to_store:
     - ggF_DNN_HH
+    - ggF_DNN_pytorch_full_HH
   extra_vars_to_store:
     - mhh_lhe
     - pthh_lhe
@@ -689,12 +691,6 @@ signal_tree_hists_ELReweighter:
     - event
     - luminosityBlock
     - weight_Central
-  # HTCondor RequestMemory (MB) for the HistMergerTask branches of vars_to_store that
-  # include signal datasets; all other branches keep the site default.
-  merger_request_memory_mb: 32000
-  # HTCondor wall time (hours) for those same branches; all other branches keep
-  # HistMergerTask's max_runtime (5 h).
-  merger_max_runtime_hours: 24
 
 payload_producers:
   ggF_DNN:
