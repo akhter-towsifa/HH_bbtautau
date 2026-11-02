@@ -241,6 +241,7 @@ histTuple_flavors:
       - luminosityBlock
       - mhh_lhe
       - pthh_lhe
+      - costhetastar_lhe
     variables:
       - ggF_DNN_HH
       - ggF_DNN_TT
@@ -682,7 +683,6 @@ signal_tree_hists_ELReweighter:
   store_signal_trees: false
   vars_to_store:
     - ggF_DNN_HH
-    - ggF_DNN_pytorch_full_HH
   extra_vars_to_store:
     - mhh_lhe
     - pthh_lhe
