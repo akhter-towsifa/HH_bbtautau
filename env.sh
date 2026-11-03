@@ -14,6 +14,7 @@ action() {
     local this_file_path="$this_dir/$(basename $this_file)"
     export ANALYSIS_PATH="$this_dir"
     export HH_INFERENCE_PATH="$ANALYSIS_PATH/inference"
+    export HH_CWS_PATH="$ANALYSIS_PATH/cws"
     export FLAF_CMSSW_VERSION="CMSSW_16_0_6"
     export FLAF_CMSSW_COMPILER="gcc13"
     # FLAF_PATH defaults to the submodule copy but is respected if pre-set (flaf_dev.sh

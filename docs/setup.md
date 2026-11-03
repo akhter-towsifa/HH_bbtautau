@@ -27,6 +27,7 @@ shared `FLAF` and `Corrections`.
 | `HHbtag` | HH-optimised b-jet tagging. |
 | `SyncTool` | Synchronisation/validation tooling. |
 | `StatInference`, `inference` | Datacards and combine-based limits/fits (shared). |
+| `cws` | The Combine Workflow System, successor of `inference`; see [Statistical inference](stat_inference.md#running-cws). |
 
 These are wired into the CMSSW build automatically by `env.sh` (it symlinks `HHbtag`, the SVfit
 packages and `HHKinFit2` into the CMSSW source tree). You do not set them up by hand.

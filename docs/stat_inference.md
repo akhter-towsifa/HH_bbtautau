@@ -60,3 +60,25 @@ PlotPullsAndImpacts --version dev --datacards "PATH_TO_CARDS/<one_card>.txt" \
     Run pulls & impacts on a **single** datacard (one mass point) at a time — not on a glob of
     `*.txt`. Add `--remove-output 4,a,y` to clear previous outputs and `--print-status 0` to find
     the output file name.
+
+## Running CWS
+
+[CWS](https://gitlab.cern.ch/cms-analysis/general/cws) (the Combine Workflow System), the
+successor of `inference`, is the `cws` submodule. `source env.sh` sets it up like `inference`: on
+the same standalone Combine, with its variables (`CWS_BASE`, `CWS_STORE`, …) written to
+`cws/.setups/flaf.sh`. Do **not** source `cws/setup.sh` in the same shell.
+
+Most CWS tasks have the same names as the `inference` ones, so CWS has a law config and task
+index of its own (`cws/law.cfg`, `cws/.law`), and it runs on the law version it pins
+(`cws/modules/law`) rather than the one of `flaf_env`. Prefix the commands with `cwsEnv`, which
+selects all three; plain `law` keeps running the FLAF and `inference` tasks.
+
+```sh
+cwsEnv law index --verbose          # once, and after updating cws
+cwsEnv cws run --analysis CONFIG --task-config ENTRY
+cwsEnv law run PlotUpperLimitsAtPoint --analysis dummy_hh_nonres --use-initialfit False --workers 4
+```
+
+Outputs go to `cws/data/store`, unless the analysis config sets `store:`. The non-resonant HH
+models are fetched into `cws/cws/models/multih_models` on first use. Only local running is
+set up: HTCondor submission of CWS tasks is not wired into FLAF yet.

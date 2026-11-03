@@ -148,7 +148,7 @@ Verified 2026-08-27 (Tests row 2026-10-29); re-check before relying on any of it
 | | |
 |---|---|
 | Layout | `AnaProd/` (`anaTupleDef.py`, `baseline.py`, `genProcessInfo.py`), `Analysis/` (`hh_bbtautau.py`, `histTupleDef.py`), `config/`, `include/`, `Studies/`, `test/`, `docs/` |
-| Submodules | `FLAF`, `Corrections`, `StatInference`, `inference`, `HHbtag`, `SyncTool`, `ClassicSVfit`, `SVfitTF`, `HHKinFit2` |
+| Submodules | `FLAF`, `Corrections`, `StatInference`, `inference`, `cws`, `HHbtag`, `SyncTool`, `ClassicSVfit`, `SVfitTF`, `HHKinFit2` |
 | Eras | Run 3: 2022, 2022EE, 2023, 2023BPix, 2024, 2025, 2026. Run 2 legacy configs also present |
 | Configs | `config/global.yaml`, `config/processes.yaml` (shared processor anchors), `config/phys_models.yaml`, `config/<era>/{datasets,processes,triggers}.yaml` |
 | Tests | `test/test_gen_process_info.py` and `test/test_qcd_estimation_ownership.py` (the QCD estimation frees every histogram it clones) are marked `needs_root`, so `unit-tests` deselects them: run them after `source env.sh` with `python -m pytest -p FLAF.test.conftest test`; a `test/test_*.py` added here runs in `unit-tests` without a workflow change (FLAF's reusable workflow, against the pinned FLAF); a test that needs ROOT, CVMFS or a grid proxy carries the `needs_root`/`needs_cvmfs`/`needs_proxy` marker (FLAF's `docs/contributing.md`, Unit tests) |
