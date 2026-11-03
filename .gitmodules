@@ -25,3 +25,6 @@
 [submodule "inference"]
 	path = inference
 	url = ssh://git@gitlab.cern.ch:7999/cms-flaf/inference.git
+[submodule "cws"]
+	path = cws
+	url = ssh://git@gitlab.cern.ch:7999/cms-analysis/general/cws.git
