@@ -18,7 +18,7 @@ def convert_kinematics(pt, eta, phi, mass):
     return px, py, pz, energy
 
 
-def convert_to_numpy(event_data, period, mass, spin):
+def convert_to_numpy(event_data, era, mass, spin):
     dau1_px, dau1_py, dau1_pz, dau1_e = convert_kinematics(
         event_data["tau1_pt"],
         event_data["tau1_eta"],
@@ -78,7 +78,7 @@ def convert_to_numpy(event_data, period, mass, spin):
         ),
         # "era": np.full(
         #     np.array(event_data["event"]).shape,
-        #     Era[period].value,
+        #     Era[era].value,
         # ),
         "pair_type": np.array(event_data["channelId"]),
         "dau1_dm": np.array(event_data["tau1_decayMode"]),

@@ -39,10 +39,9 @@ def load_kinfit_vs_mhh(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Reads kinFit_m and mhh_lhe from every (era, HH signal point) HistTuple
     found under data_root, concatenates them, and drops events where either
-    is at its sentinel value (kinFit_m == -100: HHKinFit2 didn't converge /
-    Hbb_isValid was false; mhh_lhe <= 0: not a signal sample, or the rare
-    "didn't find exactly 2 LHE Higgs bosons" fallback -- see
-    Analysis/hh_bbtautau.py::defineLHEHHVariables and include/LHEVariables.h).
+    is at its sentinel value (kinFit_m == -100: Hbb_isValid was false, so no
+    fit was run -- see AnaProd/LegacyVariables.py::GetKinFit; mhh_lhe <= 0:
+    not an HH signal sample -- see Analysis/hh_bbtautau.py::defineLHEHHVariables).
 
     Dataset names for a given (kl, kt, c2) point aren't uniform across eras
     (some are only registered under a "_LHEweights"-suffixed name -- see
@@ -107,7 +106,7 @@ def plot_2d_heatmap(
 
     corr = np.corrcoef(mhh_lhe, kinfit_m)[0, 1]
     ax.set_xlabel("$m_{HH}^{LHE}$ (GeV)")
-    ax.set_ylabel("$m_{H}^{kinfit}$ (GeV)")
+    ax.set_ylabel("$m_{HH}^{kinfit}$ (GeV)")
     ax.set_title(f"kinFit_m vs mhh_lhe | {kinfit_m.size} events, corr = {corr:.3f}")
 
     os.makedirs(os.path.dirname(output) or ".", exist_ok=True)

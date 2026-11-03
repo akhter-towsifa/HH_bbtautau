@@ -206,8 +206,8 @@ def histtuple_files(data_root: str, era: str, dataset: str) -> list[str]:
     """Locate histTuple ROOT files for one (era, dataset) under
     {data_root}/HistTuples/{era}/{dataset}/*.root -- HistTupleProducerTask's
     output layout (FLAF/Analysis/tasks.py HistTupleProducerTask.output():
-    "{version}/HistTuples/{period}/{dataset}/histTuple_*.root"), mirroring the
-    "{version}/AnaTuples/{period}/{dataset}/anaTuple_*.root" layout of its
+    "{version}/HistTuples/{era}/{dataset}/histTuple_*.root"), mirroring the
+    "{version}/AnaTuples/{era}/{dataset}/anaTuple_*.root" layout of its
     AnaTupleMergeTask input. *data_root* is expected to include the version
     segment (e.g. ".../v2608_dnn"). Supports both local filesystem paths
     (glob) and root://host//path XRootD URLs (remote directory listing),
@@ -336,7 +336,7 @@ def _apply_rotation_and_composites(f: dict) -> dict:
     return f
 
 
-def build_features(array, period: str) -> tuple[dict[str, np.ndarray], np.ndarray, np.ndarray]:
+def build_features(array, era: str) -> tuple[dict[str, np.ndarray], np.ndarray, np.ndarray]:
     """Turns a selected array chunk (already carrying the HistTuple's flat
     "SelectedFatJet_*_boosted"/"boosted_baseline" branches -- no jagged
     FatJet-selection logic needed here, see the RAW_BRANCHES module docstring)
@@ -361,7 +361,7 @@ def build_features(array, period: str) -> tuple[dict[str, np.ndarray], np.ndarra
     """
     channel_id = np.asarray(array["channelId"])  # must run before convert_to_numpy (see NOTE above)
 
-    raw = convert_to_numpy(array, period, mass=0.0, spin=0)  # mass/spin unused by the GGF net
+    raw = convert_to_numpy(array, era, mass=0.0, spin=0)  # mass/spin unused by the GGF net
     f = {k: np.asarray(v).astype(np.float64) if np.asarray(v).dtype.kind == "f" else np.asarray(v)
          for k, v in raw.items()}
     f = _apply_rotation_and_composites(f)
@@ -402,7 +402,7 @@ def load_shard(
         if not np.any(mask):
             continue
         selected = chunk[mask]
-        cat_inputs, lbn_vectors, extra_continuous = build_features(selected, period=era)
+        cat_inputs, lbn_vectors, extra_continuous = build_features(selected, era=era)
         cat_chunks.append(cat_inputs)
         lbn_chunks.append(lbn_vectors)
         cont_chunks.append(extra_continuous)
