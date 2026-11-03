@@ -116,6 +116,45 @@ def _load_merged_yaml(paths: list[str], file_name: str, special_items_prefix: st
     return merged
 
 
+def _config_search_paths(era: str, config_dir: str) -> list[str]:
+    """Mirrors FLAF.Common.Setup.Setup.config_path_order: config_dir is
+    expected to be ".../bbtautau/config" (DataConfig's default); the matching
+    ".../bbtautau/FLAF/config" is derived from it and searched too."""
+    ana_path = os.path.dirname(config_dir.rstrip("/"))
+    return [
+        os.path.join(ana_path, "FLAF", "config"),
+        os.path.join(ana_path, "FLAF", "config", era),
+        config_dir,
+        os.path.join(config_dir, era),
+    ]
+
+
+def resolve_hh_dataset_name(kl: str, kt: str, c2: str, era: str, config_dir: str) -> str | None:
+    """Returns the on-disk dataset name for one HH signal point in one era.
+
+    Dataset naming isn't uniform across eras: some benchmark points (e.g.
+    kl=2.45 in Run3_2022EE, or kl=1/c2=0 additionally in Run3_2022) are
+    registered under datasets.yaml with a "_LHEweights" suffix instead of --
+    or in addition to -- the plain hh_dataset_name() name, presumably because
+    that point was produced via LHE-level reweighting from a nearby generated
+    point rather than a dedicated direct MC sample. This tries the plain name
+    first (preferring a direct/nominal production when both are registered)
+    and falls back to the "_LHEweights" variant; returns None if neither is
+    registered for this era (not every benchmark point has been produced for
+    every era). Doesn't attempt to combine the two if both exist, nor does it
+    handle "_ext1"-style statistics-extension datasets (seen in Run3_2024) --
+    those would need a different (additive) resolution, not implemented here.
+    """
+    datasets = _load_merged_yaml(_config_search_paths(era, config_dir), "datasets.yaml")
+    nominal = hh_dataset_name(kl, kt, c2)
+    if nominal in datasets:
+        return nominal
+    lhe_variant = f"{nominal}_LHEweights"
+    if lhe_variant in datasets:
+        return lhe_variant
+    return None
+
+
 def resolve_class_datasets(class_name: str, era: str, config_dir: str) -> list[str]:
     """Expand a background class into its underlying dataset names from
     processes.yaml. Wildcard group names (ending in "*") match by prefix
@@ -126,16 +165,10 @@ def resolve_class_datasets(class_name: str, era: str, config_dir: str) -> list[s
     searched too, mirroring FLAF.Common.Setup.Setup.config_path_order.
     """
     if class_name == "HH":
-        return [hh_dataset_name(kl, kt, c2) for kl, kt, c2 in HH_SIGNAL_POINTS]
+        resolved = (resolve_hh_dataset_name(kl, kt, c2, era, config_dir) for kl, kt, c2 in HH_SIGNAL_POINTS)
+        return [name for name in resolved if name is not None]
 
-    ana_path = os.path.dirname(config_dir.rstrip("/"))
-    search_paths = [
-        os.path.join(ana_path, "FLAF", "config"),
-        os.path.join(ana_path, "FLAF", "config", era),
-        config_dir,
-        os.path.join(config_dir, era),
-    ]
-    processes = _load_merged_yaml(search_paths, "processes.yaml")
+    processes = _load_merged_yaml(_config_search_paths(era, config_dir), "processes.yaml")
 
     datasets: list[str] = []
     for group_pattern in CLASS_PROCESS_GROUPS[class_name]:
