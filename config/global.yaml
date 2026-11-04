@@ -774,3 +774,6 @@ payload_producers:
     max_runtime: 8.0
     cmssw_env: False
     awkward_based: False
+
+StatInference:
+  config: config/Datacards/x_hh_bbtautau_run3_nonres.yaml
