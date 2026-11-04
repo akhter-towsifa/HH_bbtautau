@@ -12,15 +12,19 @@ channels:
   - eTau
   - muTau
   - tauTau
-# Only the signal (OS_Iso) QCD region is used for the fit -- HistMergerTask's other
-# regions (SS_Iso, OS_AntiIso, SS_AntiIso) already feed into the merged "QCD" process
-# via the data-driven ABCD estimate, so they are not read again here. maker.py's
-# histDir() is generic over '/'-containing category names, so these resolve directly
-# to HistMergerTask's real channel/QCDRegion/category layout -- no flattening step.
+# Category names are plain: they name the datacard bins (<era>_hh_bbtautau_<channel>_<category>)
+# and the per-bin output files, so they must not contain '/'. input_categories places each
+# one in HistMergerTask's channel/QCDRegion/category layout. Only the signal (OS_Iso) QCD
+# region is read -- the other regions already feed into the merged "QCD" process via the
+# data-driven ABCD estimate.
 categories:
-  - OS_Iso/res1b
-  - OS_Iso/res2b
-  - OS_Iso/boosted
+  - res1b
+  - res2b
+  - boosted
+input_categories:
+  res1b: OS_Iso/res1b
+  res2b: OS_Iso/res2b
+  boosted: OS_Iso/boosted
 signalFractionForRelevantBins: 0.2
 keep_all_signal_hypothesis_into_single_datacard: true
 processes:
@@ -93,6 +97,9 @@ processes:
   # Backgrounds
   - process: TT
   - process: DY
+    allow_zero_integral: True
+    allow_negative_bins_within_error: True
+    max_n_sigma_for_negative_bins: 2
   - process: ST
     allow_zero_integral: True
     allow_negative_bins_within_error: True

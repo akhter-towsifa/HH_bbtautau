@@ -95,7 +95,14 @@ Datacards are written to `fs_default`:
 <fs_default>/<version>/Datacards/Run3_2022EE/
 ```
 
-e.g. `/eos/user/t/toakhter/HH_bbtautau_Run3/v2608_ggF_DNN_ELR/Datacards/Run3_2022EE/`.
+e.g. `/eos/user/t/toakhter/HH_bbtautau_Run3/v2608_ggF_DNN_ELR/Datacards/Run3_2022EE/`:
+
+```
+datacard_combined_signals.txt          # all bins and all signal points in one card
+combined_signals_all.root              # its shapes
+<era>/<channel>/<category>/datacard_<bin>.txt, <bin>.root   # one card per bin
+plots/                                 # shape plots per channel/category
+```
 Print the exact path with:
 
 ```bash
@@ -137,18 +144,25 @@ Add `--hist-bins <binning.json>` to rebin (see *Binning* below).
 SignalTrees/<process>/<variation>                              # ELReweighter trees
 ```
 
-The datacard maker looks histograms up as `<channel>/<category>/<hist_name>`, and a
-category may contain `/`. The categories therefore include the QCD region:
+A category name becomes part of the datacard bin name
+(`<era>_hh_bbtautau_<channel>_<category>`) and of the per-bin output files, so it must not
+contain `/`. The categories therefore keep plain names, and `input_categories` says where
+each one is read from in the merged file:
 
 ```yaml
 categories:
-  - OS_Iso/res1b
-  - OS_Iso/res2b
-  - OS_Iso/boosted
+  - res1b
+  - res2b
+  - boosted
+input_categories:
+  res1b: OS_Iso/res1b
+  res2b: OS_Iso/res2b
+  boosted: OS_Iso/boosted
 ```
 
-Only `OS_Iso` (the signal region) is read. The other regions already enter through the
-data-driven `QCD` process that `HistMergerTask` builds.
+The maker then reads `<channel>/OS_Iso/<category>/<hist_name>`. Only `OS_Iso` (the signal
+region) is read. The other regions already enter through the data-driven `QCD` process
+that `HistMergerTask` builds.
 
 Channels are `eTau`, `muTau`, `tauTau`. The merged files also contain `eE`, `eMu` and
 `muMu`, which are not used for the fit.
@@ -229,8 +243,11 @@ can be negative and stop the run with
 RuntimeError: Negative bins found in histogram for <channel>/OS_Iso/<category>/<process>
 ```
 
-(seen for `DY` and `TT` in a test run on `ggF_DNN_DY`). Either coarsen the binning or
-relax that process's tolerances in `processes:`. For the law chain, a binning file can be
+This is why `DY` carries `allow_negative_bins_within_error` with
+`max_n_sigma_for_negative_bins: 2`: on `ggF_DNN_HH` its negative bins are all within
+1.3σ of zero, and the boosted DY templates hold less than one event over 100 bins. If
+another process fails the same way, either coarsen the binning or relax that process's
+tolerances in `processes:`. For the law chain, a binning file can be
 set in `config/global.yaml`:
 
 ```yaml
