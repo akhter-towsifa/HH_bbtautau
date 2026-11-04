@@ -390,6 +390,23 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         for col in ("pthh_lhe", "mhh_lhe", "costhetastar_lhe"):
             self.colToSave.append(col)
 
+    def defineGenMatchDefaults(self):
+        """b-jet truth-matching branches (diagnostics only, never DNN inputs).
+        anaTupleDef.py only produces b{1,2}_genJet_* and b{1,2}_hadronFlavour
+        for MC, and b{1,2}_fromGenHbb for signal MC. HistTupleProducer appends
+        every fullResolution_variables name to colToSave unconditionally, so
+        define defaults wherever a column is missing so these columns always
+        exist (same pattern as tau{1,2}_gen_kind and the LHE variables)."""
+        cols = {str(c) for c in self.df.GetColumnNames()}
+        for leg in (1, 2):
+            for var in ("pt", "eta", "phi", "mass"):
+                if f"b{leg}_genJet_{var}" not in cols:
+                    self.df = self.df.Define(f"b{leg}_genJet_{var}", "-1.f")
+            if f"b{leg}_hadronFlavour" not in cols:
+                self.df = self.df.Define(f"b{leg}_hadronFlavour", "-1")
+            if f"b{leg}_fromGenHbb" not in cols:
+                self.df = self.df.Define(f"b{leg}_fromGenHbb", "false")
+
     def defineTriggers(self):
         for ch in self.config["channelSelection"]:
             for trg in self.config["triggers"][ch]:
@@ -743,6 +760,7 @@ def PrepareDfForHistograms(dfForHistograms):
     dfForHistograms.defineTriggers()
     dfForHistograms.defineBoostedVariables()
     dfForHistograms.defineLHEHHVariables()
+    dfForHistograms.defineGenMatchDefaults()
     dfForHistograms.redefinePUJetIDWeights()
     dfForHistograms.df = createInvMass(dfForHistograms.df)
     dfForHistograms.defineChannels()
