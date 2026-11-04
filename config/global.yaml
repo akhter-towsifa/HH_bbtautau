@@ -215,6 +215,7 @@ histTuple_flavors:
       - b2_eta
       - tautau_m_vis
       - bb_m_vis
+      - bbtautau_mass
       - met_pt
       - nBJets
       - nJet
