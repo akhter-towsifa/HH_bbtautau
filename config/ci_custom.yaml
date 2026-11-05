@@ -8,3 +8,18 @@ store_noncentral: true
 
 phys_model: TestModel
 histTuple_flavor: CI
+
+# Exercise the ELReweighter signal trees in CI (the CI flavor keeps run/event/luminosityBlock).
+# Replaces global.yaml's block in full.
+signal_tree_hists_ELReweighter:
+  store_signal_trees: true
+  vars_to_store:
+    - ggF_DNN_HH
+  extra_vars_to_store:
+    - mhh_lhe
+    - pthh_lhe
+    - costhetastar_lhe
+    - run
+    - event
+    - luminosityBlock
+    - weight_Central

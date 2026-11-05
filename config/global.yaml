@@ -215,6 +215,7 @@ histTuple_flavors:
       - b2_eta
       - tautau_m_vis
       - bb_m_vis
+      - bbtautau_mass
       - met_pt
       - nBJets
       - nJet
@@ -223,11 +224,32 @@ histTuple_flavors:
       # - mhh_lhe
       # - costhetastar_lhe
   CI:
-    fullResolution_variables: [ ]
+    fullResolution_variables:
+      - run
+      - event
+      - luminosityBlock
     variables:
       - tau1_pt
       - ggF_DNN_HH
       - kinFit_m
+  DNN_ELReweighter:
+    fullResolution_variables:
+      - ggF_DNN_HH
+      - ggF_DNN_TT
+      - ggF_DNN_DY
+      - event
+      - run
+      - luminosityBlock
+      - mhh_lhe
+      - pthh_lhe
+      - costhetastar_lhe
+    variables:
+      - ggF_DNN_HH
+      - ggF_DNN_TT
+      - ggF_DNN_DY
+      - mhh_lhe
+      - pthh_lhe
+      - costhetastar_lhe
 
 treeName: "Events"
 
@@ -655,6 +677,21 @@ unc_to_not_consider_boosted:
   - bTagShapeSF_hfstats2
   - bTagShapeSF_cferr1
   - bTagShapeSF_cferr2
+
+# Off by default: the trees need run/event/luminosityBlock in the HistTuples, which only the
+# DNN_ELReweighter (and CI) flavors keep. Enable it together with that flavor
+signal_tree_hists_ELReweighter:
+  store_signal_trees: false
+  vars_to_store:
+    - ggF_DNN_HH
+  extra_vars_to_store:
+    - mhh_lhe
+    - pthh_lhe
+    - costhetastar_lhe
+    - run
+    - event
+    - luminosityBlock
+    - weight_Central
 
 payload_producers:
   ggF_DNN:

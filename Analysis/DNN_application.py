@@ -192,8 +192,13 @@ def convert_to_numpy(event_data, era, mass, spin):
         #     Era[period].value,
         # ),
         "pair_type": np.array(event_data["channelId"]),
-        "dau1_dm": np.array(event_data["tau1_decayMode"]),
-        "dau2_dm": np.array(event_data["tau2_decayMode"]),
+        # some samples have tau2_decayMode=2, these need to be remapped as 1
+        "dau1_dm": np.where(
+            np.array(event_data["tau1_decayMode"]) == 2, 1, event_data["tau1_decayMode"]
+        ),
+        "dau2_dm": np.where(
+            np.array(event_data["tau2_decayMode"]) == 2, 1, event_data["tau2_decayMode"]
+        ),
         "dau1_charge": np.array(event_data["tau1_charge"]),
         "dau2_charge": np.array(event_data["tau2_charge"]),
         "is_boosted": np.array(event_data["boosted_baseline"]),
