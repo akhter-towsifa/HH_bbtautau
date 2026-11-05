@@ -16,11 +16,6 @@ flattening or preprocessing step in between.
 | `config/law.cfg` → `[modules]` | Registers the tasks via `StatInference.law.tasks`. |
 | `StatInference/law/StatInferenceTask.py` | `get_variable_points()` handles a model with no parameters (`parameters: [ ]`), as used here. |
 
-`StatInference/config/x_hh_bbtautau_run3_nonres.yaml` is the original copy of the config,
-written for the older hand-run recipe (`select_region_shapes.py` →
-`compute_equal_yield_binning.py` → `create_datacards.py`). It is kept for reference and is
-not used by the law chain.
-
 ## Prerequisites
 
 1. **Merged histograms for the shape discriminant.** The config reads exactly one
@@ -92,10 +87,10 @@ existing output, so use it deliberately.
 Datacards are written to `fs_default`:
 
 ```
-<fs_default>/<version>/Datacards/Run3_2022EE/
+<fs_default>/<version>/Datacards/<ERA>/
 ```
 
-e.g. `/eos/user/t/toakhter/HH_bbtautau_Run3/v2608_ggF_DNN_ELR/Datacards/Run3_2022EE/`:
+e.g. `/eos/user/u/username/HH_bbtautau_Run3/v2608/Datacards/Run3_2022EE/`:
 
 ```
 datacard_combined_signals.txt          # all bins and all signal points in one card
@@ -256,8 +251,14 @@ StatInference:
   hist_bins: config/Datacards/bins_${ERA}.json   # ${ERA} is substituted per era
 ```
 
-`StatInference/dc_make/compute_equal_yield_binning.py` and `autocoarsen_binning.py` can
-produce such a file.
+The file is a JSON list of entries, each giving the bin edges for a set of channels and
+categories:
+
+```json
+[
+  {"bins": [0.0, 0.5, 0.8, 0.9, 1.0], "channels": ["tauTau"], "categories": ["res2b"]}
+]
+```
 
 ## Adding an era
 
