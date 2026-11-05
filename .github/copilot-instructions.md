@@ -143,7 +143,7 @@ Where it goes:
 
 ## Repository facts
 
-Verified 2026-08-27; re-check before relying on any of it.
+Verified 2026-08-27 (Tests row 2026-10-29); re-check before relying on any of it.
 
 | | |
 |---|---|
@@ -151,6 +151,6 @@ Verified 2026-08-27; re-check before relying on any of it.
 | Submodules | `FLAF`, `Corrections`, `StatInference`, `inference`, `HHbtag`, `SyncTool`, `ClassicSVfit`, `SVfitTF`, `HHKinFit2` |
 | Eras | Run 3: 2022, 2022EE, 2023, 2023BPix, 2024, 2025, 2026. Run 2 legacy configs also present |
 | Configs | `config/global.yaml`, `config/processes.yaml` (shared processor anchors), `config/phys_models.yaml`, `config/<era>/{datasets,processes,triggers}.yaml` |
-| Tests | `test/test_gen_process_info.py` (marked `needs_root`, so `unit-tests` deselects it: run it after `source env.sh` with `python -m pytest -p FLAF.test.conftest test`); a `test/test_*.py` added here runs in `unit-tests` without a workflow change (FLAF's reusable workflow, against the pinned FLAF); a test that needs ROOT, CVMFS or a grid proxy carries the `needs_root`/`needs_cvmfs`/`needs_proxy` marker (FLAF's `docs/contributing.md`, Unit tests) |
+| Tests | `test/test_gen_process_info.py` and `test/test_qcd_estimation_ownership.py` (the QCD estimation frees every histogram it clones) are marked `needs_root`, so `unit-tests` deselects them: run them after `source env.sh` with `python -m pytest -p FLAF.test.conftest test`; a `test/test_*.py` added here runs in `unit-tests` without a workflow change (FLAF's reusable workflow, against the pinned FLAF); a test that needs ROOT, CVMFS or a grid proxy carries the `needs_root`/`needs_cvmfs`/`needs_proxy` marker (FLAF's `docs/contributing.md`, Unit tests) |
 | Workflows | `formatting-check`, `unit-tests` (FLAF's, over `test/` with the pinned FLAF), `repo-sanity-checks` (FLAF's sanity checks and FLAF's `run_tools/check_era_rename.py` for leftovers of the `period` → `era` rename and, since FLAF 4d9602c, its era-scope rules: no `self.era[...]` in a task class outside `only_era`, no `era=` in `req()` outside `with_eras`), `test-setup-loading`, `test-era-dimension` (FLAF's `test/test_era_dimension.py` over the seven Run 3 eras: every stage built over all eras at once and taken through what the scheduler does before anything runs, and the settings that must agree between eras), `deploy-docs`, `trigger-flaf-integration`. Formatting, era loading and the multi-era construction are checked automatically — do not comment on them |
 | Docs | `docs/`, plus the shared framework docs in `FLAF/docs/`; see the documentation section above |
