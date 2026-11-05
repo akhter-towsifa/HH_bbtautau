@@ -3,8 +3,7 @@ type: nonresonant
 model:
   parameters: [ ]
   param_dependent_bkg: false
-  # Shape discriminant. To switch to the PyTorch full-resolution DNN score instead,
-  # change both path segments to ggF_DNN_pytorch_full_HH.
+  # Shape discriminant
   input_file_pattern: ${ERA}/ggF_DNN_HH/ggF_DNN_HH.root
 eras:
   - Run3_2022EE
@@ -12,11 +11,6 @@ channels:
   - eTau
   - muTau
   - tauTau
-# Category names are plain: they name the datacard bins (<era>_hh_bbtautau_<channel>_<category>)
-# and the per-bin output files, so they must not contain '/'. input_categories places each
-# one in HistMergerTask's channel/QCDRegion/category layout. Only the signal (OS_Iso) QCD
-# region is read -- the other regions already feed into the merged "QCD" process via the
-# data-driven ABCD estimate.
 categories:
   - res1b
   - res2b
@@ -32,11 +26,7 @@ processes:
     is_data: true
     is_asimov_data: true
 
-  # ggF: dhi.models.hh_model_run23:model_default_run3_nonres recognizes all 4
-  # of our points (kl=0,1,2.45,5 @ kt=1) -- renamed to the model's
-  # "13p6TeV"-tagged labels below (hist_name keeps pointing at our real shape
-  # histogram). See inference/dhi/models/hh_model_run23.py, the
-  # model_default_run3_nonres definition, for why this model was added.
+  # ggF
   - process: ggHH_kl_0_kt_1_13p6TeV_hbbhtt
     hist_name: GluGluToHHto2B2Tau_0p00_1p00_0p00
     is_signal: true
@@ -50,19 +40,7 @@ processes:
     hist_name: GluGluToHHto2B2Tau_5p00_1p00_0p00
     is_signal: true
 
-  # VBF: model_default_run3_nonres uses the boosted_vbf_points basis (chosen
-  # over default_vbf_points because it excludes the CV~-0.012 benchmark,
-  # which made the 6x6 coupling matrix nearly singular and its derived scale
-  # factor explode to O(300-450) away from kl=1 -- see conversation history /
-  # the model's own docstring comment). That basis recognizes 6 of our 10 EFT
-  # benchmark points, renamed to the model's "13p6TeV"-tagged labels below.
-  # The 4 unmatched points (2p12_3p87_m5p96, m0p012_0p030_10p2,
-  # m1p21_1p94_m0p94, m1p83_3p57_m3p39) keep our own hist names and ride
-  # along as unscaled "additional signals" (dropped by default at
-  # create_datacards.py time; only kept with
-  # --CombineDatacards-keep-additional-signals all on `law run UpperLimits`,
-  # which we've found breaks text2workspace.py's getYieldScale -- so in
-  # practice these 4 are excluded from UpperLimits/PlotLikelihoodScan runs).
+  # VBF
   - process: qqHH_CV_1_C2V_0_kl_1_13p6TeV_hbbhtt
     hist_name: VBFHHto2B2Tau_1_0_1
     is_signal: true
@@ -117,7 +95,7 @@ processes:
   # WtoLNu dropped for now: not a major background, and its negative bins in
   # the equal-yield-binned tail hit the unconditional relevant-bin veto
   # (StatInference/common/tools.py:resolveNegativeBins) that no tolerance
-  # flag can resolve -- see StatInference/dc_make/diagnose_negative_bins.py.
+  # flag can resolve.
   - process: VBFH
     allow_zero_integral: True
     allow_negative_bins_within_error: True
@@ -167,25 +145,25 @@ uncertainties:
     type: lnN
     processes:
       - TT
-    value: [-0.036, 0.025]
+    value: [ -0.036, 0.025 ]
     # TT: scale +22.6/-33.4 on 923.6 pb (TtbarNNLO reference)
   - name: QCD_scale_DY
     type: lnN
     processes:
       - DY
-    value: [-0.011, 0.007]
+    value: [ -0.011, 0.007 ]
     # DY_NNLO_QCD_NLO_EW: +0.7%/-1.1% (MATRIX NNLO QCD + NLO EW)
   - name: QCD_scale_ST
     type: lnN
     processes:
       - ST
-    value: [-0.019, 0.020]
+    value: [ -0.019, 0.020 ]
     # tW channel (largest-uncertainty single-top sub-channel): +2.0%/-1.9%
   - name: QCD_scale_VV
     type: lnN
     processes:
       - VV
-    value: [-0.033, 0.041]
+    value: [ -0.033, 0.041 ]
     # placeholder: borrowed from the Run2 reference config's WZ QCD_scale_process
     # value (largest of WW/WZ/ZZ there) -- no trustworthy VV scale value found
     # in our own crossSections13p6TeV.yaml (only XSDB stat-precision numbers)
@@ -201,25 +179,25 @@ uncertainties:
     type: lnN
     processes:
       - ttH
-    value: [-0.093, 0.06]
+    value: [ -0.093, 0.06 ]
     # TTHto2B_M125: +6%/-9.3% (QCD Scale)
   - name: QCD_scale_VBFH
     type: lnN
     processes:
       - VBFH
-    value: [-0.003, 0.005]
+    value: [ -0.003, 0.005 ]
     # VBFHToBB_M125: +0.5%/-0.3% (QCD Scale)
   - name: QCD_scale_ggH
     type: lnN
     processes:
       - ggH
-    value: [-0.067, 0.046]
+    value: [ -0.067, 0.046 ]
     # GluGluHToTauTau_M125/GluGluHToBB_M125: +4.6%/-6.7% (theory)
   - name: QCD_scale_VH
     type: lnN
     processes:
       - VH
-    value: [-0.007, 0.004]
+    value: [ -0.007, 0.004 ]
     # WplusH_Hbb_*/WminusH_Hbb_*: +0.4%/-0.7% (QCD scale)
 
   # PDF+alphas_s: one shared, correlated nuisance (same PDF set affects every
@@ -230,27 +208,27 @@ uncertainties:
     hasMultipleValues: True
     value:
       - value: 0.025
-        processes: [TT]
+        processes: [ TT ]
         # TT: +-22.8/923.6 pb (TtbarNNLO reference)
       - value: 0.01
-        processes: [DY]
+        processes: [ DY ]
         # borrowed from bbWW's DY PDF+alphas value (same MATRIX twiki
         # reference); our own crossSections.yaml entry doesn't separately
         # list a PDF+alphas component for DY
       - value: 0.024
-        processes: [ST]
+        processes: [ ST ]
         # tW channel: +-2.4 (PDF AlphaS)
       - value: 0.035
-        processes: [ttH]
+        processes: [ ttH ]
         # TTHto2B_M125: +-3.5% (PDF alpha s)
       - value: 0.021
-        processes: [VBFH]
+        processes: [ VBFH ]
         # VBFHToBB_M125: +-2.1% (PDF alpha s)
       - value: 0.032
-        processes: [ggH]
+        processes: [ ggH ]
         # GluGluHToTauTau_M125/GluGluHToBB_M125: +-3.2 (PDF+alpha s)
       - value: 0.018
-        processes: [VH]
+        processes: [ VH ]
         # WplusH_Hbb_*/WminusH_Hbb_*: +-1.8% (PDF+alphas)
 
 autolnNThr: 0.1
@@ -261,30 +239,3 @@ autoMCStats:
   threshold: 20
   apply_to_signal: true
   mode: 1
-
-# Datacard production for this config goes through StatInference's law task chain
-# (config/law.cfg registers StatInference.law.tasks; this config's own path is wired
-# in via config/global.yaml's StatInference.config), reading HistMergerTask's merged
-# histograms directly -- no flattening/preprocess step, so the SignalTrees/ directory
-# of ELReweighter trees is copied through untouched (stage_inputs() copies each merged
-# file whole). To build the datacards:
-#
-# source env.sh
-# law run CreateDatacardsTask --version <version> --era Run3_2022EE
-#
-# (<version> is the HistMergerTask version whose Hists_merged output to read, e.g.
-# v2608_ggF_DNN_ELR -- it must have a completed
-# Hists_merged/Run3_2022EE/ggF_DNN_HH/ggF_DNN_HH.root, the only variable this config's
-# model.input_file_pattern requires). Datacards are written to fs_default, under
-# <fs_default>/<version>/Datacards/Run3_2022EE/. See config/Datacards/README.md.
-#
-# To check the task graph/inputs without building anything:
-# law run CreateDatacardsTask --version <version> --era Run3_2022EE --print-status 2
-#
-# Note: invoke the task by its plain class name (CreateDatacardsTask), not the
-# fully-qualified StatInference.law.CreateDatacardsTask -- the latter hits an
-# unrelated law CLI task-lookup issue.
-#
-# The previous hand-run recipe (select_region_shapes.py -> compute_equal_yield_binning.py
-# -> create_datacards.py) is kept with the original copy of this config at
-# StatInference/config/x_hh_bbtautau_run3_nonres.yaml.
