@@ -7,6 +7,14 @@ from FLAF.Common.HistHelper import *
 from FLAF.Common.Utilities import *
 
 
+def _detached(hist):
+    # PyROOT (ROOT 6.40) does not own what Clone() returns: otherwise each copy stays in the
+    # current directory, gROOT in HistMergerFromHists, until the job ends
+    hist.SetDirectory(0)
+    ROOT.SetOwnership(hist, True)
+    return hist
+
+
 def QCD_Estimation(
     histograms,
     all_samples_list,
@@ -21,9 +29,9 @@ def QCD_Estimation(
     key_C = ((channel, "SS_Iso", category), (uncName, scale))
     key_D = ((channel, "SS_AntiIso", category), (uncName, scale))
     hist_data = histograms[data_process_name]
-    hist_data_B = hist_data[key_B].Clone()
-    hist_data_C = hist_data[key_C].Clone()
-    hist_data_D = hist_data[key_D].Clone()
+    hist_data_B = _detached(hist_data[key_B].Clone())
+    hist_data_C = _detached(hist_data[key_C].Clone())
+    hist_data_D = _detached(hist_data[key_D].Clone())
     n_data_B = hist_data_B.Integral(0, hist_data_B.GetNbinsX() + 1)
     n_data_C = hist_data_C.Integral(0, hist_data_C.GetNbinsX() + 1)
     n_data_D = hist_data_D.Integral(0, hist_data_D.GetNbinsX() + 1)
@@ -45,9 +53,9 @@ def QCD_Estimation(
             continue
         # print(sample)
         hist_sample = histograms[sample]
-        hist_sample_B = hist_sample[key_B].Clone()
-        hist_sample_C = hist_sample[key_C].Clone()
-        hist_sample_D = hist_sample[key_D].Clone()
+        hist_sample_B = _detached(hist_sample[key_B].Clone())
+        hist_sample_C = _detached(hist_sample[key_C].Clone())
+        hist_sample_D = _detached(hist_sample[key_D].Clone())
         n_sample_B = hist_sample_B.Integral(0, hist_sample_B.GetNbinsX() + 1)
         n_data_B -= n_sample_B
         n_sample_C = hist_sample_C.Integral(0, hist_sample_C.GetNbinsX() + 1)
@@ -112,7 +120,7 @@ def QCD_Estimation(
     print(f"n_data_C = {n_data_C}")
     print(f"n_data_D = {n_data_D}")
     print(f"QCD norm = {qcd_norm}")
-    hist_qcd_Central = hist_data_C.Clone()
+    hist_qcd_Central = _detached(hist_data_C.Clone())
     hist_qcd_Central.Scale(qcd_norm)
     n_data_D_abs = n_data_D
     if n_data_D < 0:
@@ -133,9 +141,9 @@ def QCD_Estimation(
     )
 
     qcd_norm_shape = n_data_C / n_data_D if n_data_D != 0.0 else 0.0
-    hist_qcd_Up = hist_data_B.Clone()
+    hist_qcd_Up = _detached(hist_data_B.Clone())
     hist_qcd_Up.Scale(qcd_norm_shape)
-    hist_qcd_Down = hist_data_B.Clone()
+    hist_qcd_Down = _detached(hist_data_B.Clone())
     hist_qcd_Down.Scale(qcd_norm_shape)
     n_data_C_abs = n_data_C
     if n_data_C < 0:
@@ -199,9 +207,9 @@ def QCD_Estimation_symm(
     key_C = ((channel, "SS_Iso", category), (uncName, scale))
     key_D = ((channel, "SS_AntiIso", category), (uncName, scale))
     hist_data = histograms["data"]
-    hist_data_B = hist_data[key_B].Clone()
-    hist_data_C = hist_data[key_C].Clone()
-    hist_data_D = hist_data[key_D].Clone()
+    hist_data_B = _detached(hist_data[key_B].Clone())
+    hist_data_C = _detached(hist_data[key_C].Clone())
+    hist_data_D = _detached(hist_data[key_D].Clone())
     n_data_B = hist_data_B.Integral(0, hist_data_B.GetNbinsX() + 1)
     n_data_C = hist_data_C.Integral(0, hist_data_C.GetNbinsX() + 1)
     n_data_D = hist_data_D.Integral(0, hist_data_D.GetNbinsX() + 1)
@@ -221,9 +229,9 @@ def QCD_Estimation_symm(
             continue
         # print(sample)
         hist_sample = histograms[sample]
-        hist_sample_B = hist_sample[key_B].Clone()
-        hist_sample_C = hist_sample[key_C].Clone()
-        hist_sample_D = hist_sample[key_D].Clone()
+        hist_sample_B = _detached(hist_sample[key_B].Clone())
+        hist_sample_C = _detached(hist_sample[key_C].Clone())
+        hist_sample_D = _detached(hist_sample[key_D].Clone())
         n_sample_B = hist_sample_B.Integral(0, hist_sample_B.GetNbinsX() + 1)
         n_data_B -= n_sample_B
         n_sample_C = hist_sample_C.Integral(0, hist_sample_C.GetNbinsX() + 1)
@@ -284,11 +292,11 @@ def QCD_Estimation_symm(
     if n_data_C != 0:
         hist_data_C.Scale(1 / n_data_C)
 
-    hist_qcd_Up = hist_data_B.Clone()
+    hist_qcd_Up = _detached(hist_data_B.Clone())
     hist_qcd_Up.Scale(qcd_norm)
-    hist_qcd_Down = hist_data_C.Clone()
+    hist_qcd_Down = _detached(hist_data_C.Clone())
     hist_qcd_Down.Scale(qcd_norm)
-    hist_qcd_Central = hist_data_B.Clone()
+    hist_qcd_Central = _detached(hist_data_B.Clone())
     hist_qcd_Central.Add(hist_data_C)
     hist_qcd_Central.Scale(1.0 / 2.0)
     hist_qcd_Central.Scale(qcd_norm)
@@ -365,9 +373,9 @@ def QCD_Estimation_Inverted(
     key_B = ((channel, "SS_Iso", category), (uncName, scale))
     key_D = ((channel, "SS_AntiIso", category), (uncName, scale))
     hist_data = histograms["data"]
-    hist_data_B = hist_data[key_B].Clone()
-    hist_data_C = hist_data[key_C].Clone()
-    hist_data_D = hist_data[key_D].Clone()
+    hist_data_B = _detached(hist_data[key_B].Clone())
+    hist_data_C = _detached(hist_data[key_C].Clone())
+    hist_data_D = _detached(hist_data[key_D].Clone())
     n_data_B = hist_data_B.Integral(0, hist_data_B.GetNbinsX() + 1)
     n_data_C = hist_data_C.Integral(0, hist_data_C.GetNbinsX() + 1)
     n_data_D = hist_data_D.Integral(0, hist_data_D.GetNbinsX() + 1)
@@ -387,9 +395,9 @@ def QCD_Estimation_Inverted(
             continue
         # print(sample)
         hist_sample = histograms[sample]
-        hist_sample_B = hist_sample[key_B].Clone()
-        hist_sample_C = hist_sample[key_C].Clone()
-        hist_sample_D = hist_sample[key_D].Clone()
+        hist_sample_B = _detached(hist_sample[key_B].Clone())
+        hist_sample_C = _detached(hist_sample[key_C].Clone())
+        hist_sample_D = _detached(hist_sample[key_D].Clone())
         n_sample_B = hist_sample_B.Integral(0, hist_sample_B.GetNbinsX() + 1)
         n_data_B -= n_sample_B
         n_sample_C = hist_sample_C.Integral(0, hist_sample_C.GetNbinsX() + 1)
@@ -445,7 +453,7 @@ def QCD_Estimation_Inverted(
             0.0,
             0.0,
         )
-    hist_qcd_Central = hist_data_C.Clone()
+    hist_qcd_Central = _detached(hist_data_C.Clone())
     hist_qcd_Central.Scale(qcd_norm)
     n_data_D_abs = n_data_D
     if n_data_D < 0:
@@ -466,9 +474,9 @@ def QCD_Estimation_Inverted(
     )
 
     qcd_norm_shape = n_data_C / n_data_D if n_data_D != 0.0 else 0.0
-    hist_qcd_Up = hist_data_B.Clone()
+    hist_qcd_Up = _detached(hist_data_B.Clone())
     hist_qcd_Up.Scale(qcd_norm_shape)
-    hist_qcd_Down = hist_data_B.Clone()
+    hist_qcd_Down = _detached(hist_data_B.Clone())
     hist_qcd_Down.Scale(qcd_norm_shape)
     n_data_C_abs = n_data_C
     if n_data_C < 0:
