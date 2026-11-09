@@ -1,0 +1,51 @@
+parameters:
+  version: Run3_2022EE_v2608
+  campaign: 2022postEE   # registered key in general_config.yaml -> correct lumi label
+  model: model_nonres_hh_kappa
+  model_options:
+    - withoutProcesses=qqhh   # drop VBF (qqHH) unless VBF scaling is corrected
+
+datacards:
+  ggF_DNN_HH:
+    path: /eos/user/t/toakhter/HH_bbtautau_Run3/v2608_ggF_DNN_ELR/Datacards/Run3_2022EE/datacard_combined_signals.txt
+    name: DNN Score
+    campaign: 2022postEE
+
+tasks:
+  PlotUpperLimitsAtPoint:
+    datacards: ggF_DNN_HH
+    pois: r
+    parameter_values: kl=1:kt=1
+    show_parameters: kl,kt
+    unblinded: false
+    style: cms
+
+  PlotUpperLimits:
+    datacards: ggF_DNN_HH
+    pois: r
+    scan_parameters: { name: kl, min: -25, max: 25, points: 26 }
+    show_parameters: kt
+    unblinded: false
+    style: cms
+    save_ranges: true   # dump the allowed kl range (limit > 1) to a json
+    y_log: true
+
+  PlotUpperLimits2D:
+    datacards: ggF_DNN_HH
+    pois: r
+    scan_parameters: [ { name: kl, min: -25, max: 25, points: 11 }, { name: kt, min: -5, max: 5, points: 11 } ]
+    unblinded: false
+    style: cms
+    z_log: true
+
+  PlotMultipleLikelihoodScans:
+    datacards: ggF_DNN_HH
+    pois: kl
+    scan_parameters: { name: kl, min: -25, max: 25, points: 26 }
+    show_parameters: kt
+    save_ranges: true   # dump best-fit kl + 1/2-sigma interval to a json
+    shift_negative_values: true
+    recompute_best_fit: true
+    show_points: true
+    unblinded: false
+    style: cms
