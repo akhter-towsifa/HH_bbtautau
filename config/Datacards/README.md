@@ -14,11 +14,12 @@ flattening or preprocessing step in between.
 | `config/Datacards/hh_bbtautau_run3_nonres.yaml` | The datacard config: model, eras, channels, categories, processes, uncertainties. |
 | `config/global.yaml` → `StatInference.config` | Points the task chain at the datacard config above. |
 | `config/law.cfg` → `[modules]` | Registers the tasks via `StatInference.law.tasks`. |
-| `StatInference/law/StatInferenceTask.py` | `get_variable_points()` handles a model with no parameters (`parameters: [ ]`), as used here. |
+| `StatInference/law/StatInferenceTask.py`, `CreateDatacardsTask.py` | Handle a model with no parameters (`parameters: [ ]`), as used here: such a card is built as one point per era with mass `None`, in the same `(card, era, mass)` branch layout as the resonant cards. |
 
 ## Prerequisites
 
-1. **Merged histograms for the shape discriminant.** The config reads exactly one
+**Merged histograms for the shape discriminant.** 
+   The config reads exactly one
    variable, set by `model.input_file_pattern`:
 
    ```yaml
@@ -28,24 +29,13 @@ flattening or preprocessing step in between.
    so `HistMergerTask` must have finished for that variable and era:
 
    ```
-   <fs_HistTuple>/<version>/Hists_merged/Run3_2022EE/ggF_DNN_HH/ggF_DNN_HH.root
+   <fs_Hists>/<version>/Hists_merged/Run3_2022EE/ggF_DNN_HH/ggF_DNN_HH.root
    ```
+
+   `fs_Hists` falls back to `fs_HistTuple`, then to `fs_default`, when unset.
 
    Other merged variables (`ggF_DNN_TT`, `ggF_DNN_DY`, the `ggF_DNN_pytorch_full_*`
    variants other than the one chosen, …) are not read and need not exist.
-
-2. **Environment.** From the repository root:
-
-   ```bash
-   source env.sh
-   ```
-
-3. **Grid proxy**, if `fs_default` points at EOS over `davs://` (the default in
-   `config/user_custom.yaml`). Outputs on EOS cannot be written without one:
-
-   ```bash
-   voms-proxy-init -voms cms -rfc -valid 192:00
-   ```
 
 ## Producing the datacards
 
@@ -56,7 +46,8 @@ law run CreateDatacardsTask --version <version> --era Run3_2022EE --print-status
 ```
 
 The only dependency should be `MergedHists(variable=ggF_DNN_HH, ...)`, shown as
-`existent`. If it shows `absent`, the merge for that version/variable is not done.
+`existent`. If it shows `absent`, either the merge for that version/variable is not done
+or the grid proxy has expired.
 
 ### 2. Build the datacards
 
@@ -84,19 +75,23 @@ existing output, so use it deliberately.
 
 ### 3. Output
 
-Datacards are written to `fs_default`:
+Datacards are written to `fs_StatInference` (which falls back to `fs_default` when
+unset), one directory per card and era. The card is named after its config file, here
+`hh_bbtautau_run3_nonres`. A non-resonant card has no mass point, so there is no
+`<param>_<mass>` level below the era:
 
 ```
-<fs_default>/<version>/Datacards/<ERA>/
+<fs_StatInference>/<version>/Datacards/hh_bbtautau_run3_nonres/<ERA>/
 ```
 
-e.g. `/eos/user/u/username/HH_bbtautau_Run3/v2608/Datacards/Run3_2022EE/`:
+e.g. `/eos/user/u/username/HH_bbtautau_Run3/v2608/Datacards/hh_bbtautau_run3_nonres/Run3_2022EE/`:
 
 ```
 datacard_combined_signals.txt          # all bins and all signal points in one card
 combined_signals_all.root              # its shapes
+card_config.yaml                       # the config the card was built from
 <era>/<channel>/<category>/datacard_<bin>.txt, <bin>.root   # one card per bin
-plots/                                 # shape plots per channel/category
+plots/                                 # shape plots per channel/category, and grids
 ```
 Print the exact path with:
 
@@ -189,7 +184,7 @@ merged file.
 - **ggF**: 4 points, `ggHH_kl_<kl>_kt_1_13p6TeV_hbbhtt` (kl = 0, 1, 2.45, 5).
 - **VBF**: 10 points, `qqHH_CV_<CV>_C2V_<C2V>_kl_<kl>_13p6TeV_hbbhtt`.
 
-The VBF names follow the `cws` sample labels, so all 10 points match the 10-point
+The VBF names follow the `cws` submodule sample labels, so all 10 points match the 10-point
 `default` VBF basis of `cws`'s `model_nonres_hh_heft`
 (`cws/models/multih_models/nonresonant_HHplus/kappa_framework/hh_model_kappa_framework/qqhh_default.csv`).
 `cws` ignores the trailing `_hbbhtt` decay tag and differences in zero padding
