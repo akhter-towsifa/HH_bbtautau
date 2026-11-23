@@ -776,4 +776,4 @@ payload_producers:
     awkward_based: False
 
 StatInference:
-  config: config/Datacards/x_hh_bbtautau_run3_nonres.yaml
+  config: config/Datacards/hh_bbtautau_run3_nonres.yaml

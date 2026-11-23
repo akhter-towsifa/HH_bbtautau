@@ -11,7 +11,7 @@ flattening or preprocessing step in between.
 
 | File | Role |
 |---|---|
-| `config/Datacards/x_hh_bbtautau_run3_nonres.yaml` | The datacard config: model, eras, channels, categories, processes, uncertainties. |
+| `config/Datacards/hh_bbtautau_run3_nonres.yaml` | The datacard config: model, eras, channels, categories, processes, uncertainties. |
 | `config/global.yaml` → `StatInference.config` | Points the task chain at the datacard config above. |
 | `config/law.cfg` → `[modules]` | Registers the tasks via `StatInference.law.tasks`. |
 | `StatInference/law/StatInferenceTask.py` | `get_variable_points()` handles a model with no parameters (`parameters: [ ]`), as used here. |
@@ -122,7 +122,7 @@ env -i HOME=$HOME ANALYSIS_PATH=$ANALYSIS_PATH ANALYSIS_DATA_PATH=$ANALYSIS_DATA
   $FLAF_PATH/cmsEnv.sh python3 StatInference/dc_make/create_datacards.py \
     --input  <input_dir> \
     --output <output_dir> \
-    --config config/Datacards/x_hh_bbtautau_run3_nonres.yaml \
+    --config config/Datacards/hh_bbtautau_run3_nonres.yaml \
     --eras   Run3_2022EE
 ```
 
@@ -247,7 +247,7 @@ set in `config/global.yaml`:
 
 ```yaml
 StatInference:
-  config: config/Datacards/x_hh_bbtautau_run3_nonres.yaml
+  config: config/Datacards/hh_bbtautau_run3_nonres.yaml
   hist_bins: config/Datacards/bins_${ERA}.json   # ${ERA} is substituted per era
 ```
 
