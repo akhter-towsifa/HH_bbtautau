@@ -1,0 +1,79 @@
+# The CI card (CI in ci_custom.yaml): the non-resonant card's structure on the CI sample set,
+# so the integration pipeline runs histograms -> datacards -> limits.
+#
+# Same model, discriminant, channels and categories as ../hh_bbtautau_run3_nonres.yaml, but
+# the processes of the CI physics model (TestModel in config/phys_models.yaml) and one bin
+# per channel and category: at --test statistics anything finer is empty or negative.
+analysis: hh_bbtautau
+type: nonresonant
+model:
+  parameters: [ ]
+  param_dependent_bkg: false
+  input_file_pattern: ${ERA}/ggF_DNN_HH/ggF_DNN_HH.root
+# the eras the integration pipeline runs (HH_bbtautau_eras in the trigger's variables)
+eras:
+  - Run3_2022
+  - Run3_2022EE
+  - Run3_2023
+  - Run3_2023BPix
+channels:
+  - eTau
+  - muTau
+  - tauTau
+categories:
+  - res1b
+  - res2b
+  - boosted
+input_categories:
+  res1b: OS_Iso/res1b
+  res2b: OS_Iso/res2b
+  boosted: OS_Iso/boosted
+# one bin over the whole DNN score range
+hist_bins: [ 0.0, 1.0 ]
+signalFractionForRelevantBins: 0.2
+keep_all_signal_hypothesis_into_single_datacard: true
+processes:
+  - process: data_obs
+    is_data: true
+    is_asimov_data: true
+  # the CI signal sample (GluGlutoHHto2B2Tau kl=0); may be empty in a category at --test
+  # statistics, and the category is then left without signal
+  - process: custom_CI_Signal
+    is_signal: true
+    allow_zero_integral: true
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+  - process: custom_CI_Background_TT
+    allow_zero_integral: true
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+  # amc@NLO: its negative weights need not cancel at --test 1000
+  - process: custom_CI_Background_DY
+    allow_zero_integral: true
+    allow_negative_integral: true
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 10
+
+uncertainties:
+  # the luminosity uncertainties of ../hh_bbtautau_run3_nonres.yaml
+  - name: lumi_1
+    type: lnN
+    eras:
+      - Run3_2022
+      - Run3_2022EE
+    value: 0.0138
+  - name: lumi_2
+    type: lnN
+    eras:
+      - Run3_2023
+      - Run3_2023BPix
+    value: 0.0127
+
+autolnNThr: 0.1
+asymlnNThr: 0.001
+ignorelnNThr: 0.001
+autoMCStats:
+  apply: true
+  threshold: 20
+  apply_to_signal: true
+  mode: 1

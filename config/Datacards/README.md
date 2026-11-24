@@ -15,6 +15,8 @@ flattening or preprocessing step in between.
 | `config/global.yaml` → `StatInference.config` | Points the task chain at the datacard config above. |
 | `config/law.cfg` → `[modules]` | Registers the tasks via `StatInference.law.tasks`. |
 | `StatInference/law/StatInferenceTask.py`, `CreateDatacardsTask.py` | Handle a model with no parameters (`parameters: [ ]`), as used here: such a card is built as one point per era with mass `None`, in the same `(card, era, mass)` branch layout as the resonant cards. |
+| `StatInference/law/NonResonantLimitsTask.py`, `NonResonantLimitsAndHistPlotTask.py` | The limits of a non-resonant card (see *Limits* below), and the full pipeline CI runs (see *Integration CI*). |
+| `config/Datacards/CI/CI_card_nonres.yaml`, `config/ci_custom.yaml` | The CI card and its wiring (see *Integration CI* below). |
 
 ## Prerequisites
 
@@ -66,9 +68,10 @@ law run CreateDatacardsTask --version <version> --era Run3_2022EE --workflow loc
 `<version>` is the version of the `HistMergerTask` output to read, e.g.
 `v2608_ggF_DNN_ELR`.
 
-Invoke the task by its plain class name, `CreateDatacardsTask`. The fully-qualified
-`StatInference.law.CreateDatacardsTask` fails with
-`TypeError: issubclass() arg 1 must be a class` (a law CLI lookup issue).
+Invoke the task by its plain class name, `CreateDatacardsTask`, or through the `tasks`
+module, `StatInference.law.tasks.CreateDatacardsTask`. `StatInference.law.CreateDatacardsTask`
+names the module of the same name, not the class, and fails with
+`TypeError: issubclass() arg 1 must be a class`.
 
 To rebuild datacards that already exist, `--remove-output` is needed; it deletes the
 existing output, so use it deliberately.
@@ -98,6 +101,31 @@ Print the exact path with:
 ```bash
 law run CreateDatacardsTask --version <version> --era Run3_2022EE --print-output 0
 ```
+
+### 4. Limits
+
+```bash
+law run NonResonantLimitsTask --version <version> --era Run3_2022EE --workflow local
+```
+
+builds the datacards if needed, then computes the asymptotic CLs upper limit on the signal
+strength `r` for each era of the card and for the combination of its top-level eras
+(`combineCards.py`). It runs `text2workspace.py` with combine's default physics model,
+where `r` scales every signal process of the card together, and
+`combine -M AsymptoticLimits`. No HH model is applied. The limits are blinded (expected
+only, from an Asimov dataset) unless `--unblinded` is given.
+
+Outputs, local under `$ANALYSIS_DATA_PATH/<version>/`:
+
+```
+NonResonantLimitsTask/hh_bbtautau_run3_nonres/combined/limits.json   # per era and "combined"
+Datacards/hh_bbtautau_run3_nonres/<era>/      # local mirror of each era's datacards
+Datacards/hh_bbtautau_run3_nonres/combined/datacard_combined.txt
+```
+
+`limits.json` holds, for each era and for `combined`, the expected limits at the 2.5, 16,
+50, 84 and 97.5% quantiles (and `observed` when unblinded). The task fails if combine
+leaves any of them out.
 
 ### Running `create_datacards.py` by hand
 
@@ -222,6 +250,39 @@ Example:
 ```
 
 The `name` must match the uncertainty part of the histogram names in the merged file.
+
+## Integration CI
+
+`config/ci_custom.yaml` replaces the `StatInference:` block with the CI card:
+
+```yaml
+StatInference:
+  cards:
+    CI: config/Datacards/CI/CI_card_nonres.yaml
+```
+
+`CI_card_nonres.yaml` has the structure of the analysis card (no model parameters,
+`ggF_DNN_HH`, the same channels and categories) on the processes of the CI physics model
+(`TestModel`: `custom_CI_Signal`, `custom_CI_Background_TT`, `custom_CI_Background_DY`),
+with one bin per channel and category (`hist_bins: [ 0.0, 1.0 ]`) and the luminosity
+uncertainties only. Its eras are the ones the integration pipeline runs.
+
+The full pipeline -- histograms, plots, datacards and limits -- is
+`StatInference.law.tasks.NonResonantLimitsAndHistPlotTask`, which requires
+`NonResonantLimitsTask` and `HistPlotTask` (the non-resonant counterpart of HH_bbWW's
+`ResonantLimitsAndHistPlotTask`). A task whose name contains `Inference` runs once over all
+eras, after the histogram jobs of each era.
+
+The task a bare `@cms-flaf-bot test` runs is `HH_bbtautau_task` in `integration_cfg.yaml`
+of `cms-flaf/FLAF_ci`. Until that is set to the task above, name it in the trigger:
+
+```
+@cms-flaf-bot test
+- HH_bbtautau_task=StatInference.law.tasks.NonResonantLimitsAndHistPlotTask
+```
+
+The CI card's eras need only be among the eras CI runs (`HH_bbtautau_eras`); the other
+eras get histograms and plots only.
 
 ## Binning and negative bins
 

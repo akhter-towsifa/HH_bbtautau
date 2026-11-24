@@ -9,6 +9,13 @@ store_noncentral: true
 phys_model: TestModel
 histTuple_flavor: CI
 
+# The CI card, so the integration pipeline runs down to the limits (NonResonantLimitsTask):
+# the non-resonant card's structure on the CI processes, one bin per channel and category.
+# Replaces global.yaml's StatInference block in full.
+StatInference:
+  cards:
+    CI: config/Datacards/CI/CI_card_nonres.yaml
+
 # Exercise the ELReweighter signal trees in CI (the CI flavor keeps run/event/luminosityBlock).
 # Replaces global.yaml's block in full.
 signal_tree_hists_ELReweighter:
