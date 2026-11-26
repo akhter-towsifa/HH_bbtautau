@@ -1,15 +1,29 @@
+flaf:
+  era: ${oc.env:FLAF_CWS_ERA}
+  campaigns:
+    Run3_2022: 2022preEE
+    Run3_2022EE: 2022postEE
+    Run3_2023: 2023preBPix
+    Run3_2023BPix: 2023postBPix
+    Run3_2024: '2024'
+
 parameters:
-  version: Run3_2022EE_v2608
-  campaign: 2022postEE   # registered key in general_config.yaml -> correct lumi label
+  # <era>_<FLAF --version>, set by CWSTask
+  version: ${oc.env:FLAF_CWS_VERSION}
+  campaign: ${flaf.campaigns.${flaf.era}}
   model: model_nonres_hh_kappa
   model_options:
     - withoutProcesses=qqhh   # drop VBF (qqHH) unless VBF scaling is corrected
+  # read by the tasks that take it (the limits and scans), skipped by the others
+  use_initialfit: false
 
 datacards:
   ggF_DNN_HH:
-    path: /eos/user/t/toakhter/HH_bbtautau_Run3/v2608_ggF_DNN_ELR/Datacards/Run3_2022EE/datacard_combined_signals.txt
+    # the era's cards as CreateDatacardsTask writes them (<fs_default>/<version>/Datacards/<era>),
+    # mirrored to a local directory by CWSTask
+    path: ${oc.env:FLAF_CWS_DATACARDS}/datacard_combined_signals.txt
     name: DNN Score
-    campaign: 2022postEE
+    campaign: ${parameters.campaign}
 
 tasks:
   PlotUpperLimitsAtPoint:

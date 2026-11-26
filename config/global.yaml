@@ -693,6 +693,11 @@ signal_tree_hists_ELReweighter:
     - luminosityBlock
     - weight_Central
 
+# The CWS analysis config that StatInference's CWSTask runs (--cws-config overrides it). Kept out
+# of the StatInference block, which a user config replaces in full.
+CWS:
+  config: config/Datacards/cws_bbtt.yaml
+
 payload_producers:
   ggF_DNN:
     producers_module_name: Analysis.DNN_application

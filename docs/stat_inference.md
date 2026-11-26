@@ -86,12 +86,11 @@ A CWS run is described by an **analysis config**: the datacards, the physics mod
 settings of each task. The one for HH→bb̄ττ is
 [`config/Datacards/cws_bbtt.yaml`](https://github.com/cms-flaf/HH_bbtautau/blob/main/config/Datacards/cws_bbtt.yaml):
 
-- `parameters`: the `version` of the outputs (`Run3_2022EE_v2608`), the `campaign` (`2022postEE`,
-  which sets the luminosity label) and the `model` with its options
-  (`model_nonres_hh_kappa`, VBF dropped with `withoutProcesses=qqhh`);
-- `datacards`: the cards by name. `ggF_DNN_HH` is the card of the DNN score fit, under your
-  `fs_default` area: `<fs_default>/<version>/Datacards/<era>/datacard_combined_signals.txt`. Edit the `path` to point
-  at your own cards;
+- `flaf.campaigns`: the CWS campaign of each FLAF era (it sets the luminosity label);
+- `parameters`: the `version`, the `campaign` and the `model` with its options
+  (`model_nonres_hh_kappa`, VBF dropped with `withoutProcesses=qqhh`), and `use_initialfit: false`;
+- `datacards`: the cards by name. `ggF_DNN_HH` is the card of the DNN score fit,
+  `datacard_combined_signals.txt` of the era;
 - `tasks`: one entry per task (`PlotUpperLimitsAtPoint`, `PlotUpperLimits`, …), with its POIs,
   scan ranges and plot options. An entry with a `task:` key is a named variant of that task
   (`PlotUpperLimits_kt` is a `PlotUpperLimits` scan in kt).
@@ -100,32 +99,63 @@ settings of each task. The one for HH→bb̄ττ is
 the examples shipped with CWS, a bare name looked up in `cws/cws/conf/task_config/`
 (`--analysis dummy_hh_nonres`).
 
-### Running a task
+The config names no era and no path. They are read from the environment with `${oc.env:...}`:
+`FLAF_CWS_ERA` (the FLAF era, mapped to its campaign through `flaf.campaigns`), `FLAF_CWS_VERSION`
+(the CWS version, `<era>_<FLAF version>`) and `FLAF_CWS_DATACARDS` (the directory holding the era's
+cards). `CWSTask` sets all three; to run CWS by hand, export them first (see the head of the config).
+
+### Running through FLAF: `CWSTask`
+
+`CWSTask` (in `StatInference/law/CWSTask.py`) runs entries of the config on the datacards of a FLAF
+version, with plain `law` (no `cwsEnv`; it starts `cws run` in the CWS environment itself):
+
+```sh
+# one entry
+law run CWSTask --version v2608_ggF_DNN_ELR --era Run3_2022EE --cws-task-config PlotUpperLimits
+
+# several entries, or all of them (no --cws-task-config), with 4 workers for the scans
+law run CWSTask --version v2608_ggF_DNN_ELR --era Run3_2022EE \
+  --cws-task-config PlotUpperLimits,PlotMultipleLikelihoodScans --cws-workers 4
+```
+
+For each era of `--era` it mirrors `<fs_StatInference>/<version>/Datacards/<era>` (`fs_StatInference`
+falls back to `fs_default`) to `$ANALYSIS_DATA_PATH/<version>/CWS_datacards/<era>`, exports the three
+variables, runs `cws run --analysis <config> --task-config <entry>` and collects the plots into
+`<fs_StatInference>/<version>/CWS/<era>/<entry>/`. Options:
+
+- `--cws-config`: another analysis config (default: `CWS.config` of `global.yaml`);
+- `--cws-args='--opt value'`: more options for `cws run` (write it with `=`, as it starts with a dash);
+- `--redraw`: draw the plots again (`--remove-output 0,a,y` on the CWS side; no fit is recomputed).
+
+The datacards are inputs: `CWSTask` reads them as they are and does not build them first.
+
+### Running a task with `cwsEnv`
+
 
 With `law run`, name the task and the config; the task settings come from the config entry of the
 same name, or from the entry given with `--analysis-task-config`:
 
 ```sh
 # expected limit on r at kl = kt = 1
-cwsEnv law run PlotUpperLimitsAtPoint --analysis config/Datacards/cws_bbtt.yaml --use-initialfit False
+cwsEnv law run PlotUpperLimitsAtPoint --analysis config/Datacards/cws_bbtt.yaml
 
 # limit on r as a function of kl, then of kt (the PlotUpperLimits_kt entry)
-cwsEnv law run PlotUpperLimits --analysis config/Datacards/cws_bbtt.yaml --use-initialfit False --workers 4
+cwsEnv law run PlotUpperLimits --analysis config/Datacards/cws_bbtt.yaml --workers 4
 cwsEnv law run PlotUpperLimits --analysis config/Datacards/cws_bbtt.yaml \
-  --analysis-task-config PlotUpperLimits_kt --use-initialfit False --workers 4
+  --analysis-task-config PlotUpperLimits_kt --workers 4
 
 # limit map in (kl, kt)
-cwsEnv law run PlotUpperLimits2D --analysis config/Datacards/cws_bbtt.yaml --use-initialfit False --workers 4
+cwsEnv law run PlotUpperLimits2D --analysis config/Datacards/cws_bbtt.yaml --workers 4
 
 # likelihood scan in kl
-cwsEnv law run PlotMultipleLikelihoodScans --analysis config/Datacards/cws_bbtt.yaml --use-initialfit False --workers 4
+cwsEnv law run PlotMultipleLikelihoodScans --analysis config/Datacards/cws_bbtt.yaml --workers 4
 ```
 
 `cws run` does the same, but reads the task from the entry's `task:` key, so only the entry is
 named:
 
 ```sh
-cwsEnv cws run --analysis config/Datacards/cws_bbtt.yaml --task-config PlotUpperLimits_kt --use-initialfit False --workers 4
+cwsEnv cws run --analysis config/Datacards/cws_bbtt.yaml --task-config PlotUpperLimits_kt --workers 4
 cwsEnv cws run --analysis config/Datacards/cws_bbtt.yaml --task-config list   # the entries of the config
 ```
 
@@ -138,6 +168,6 @@ Hints:
 - `--workers N` runs the points of a scan in parallel;
 - the configs keep `unblinded: false`, so only expected results are computed.
 
-Outputs go to `cws/data/store/<task>/<model>/<datacards>/…/<version>/`, unless the analysis config
+Outputs go to `cws/data/store/<task>/<model>/<datacards>/…/<version>/` (for `CWSTask`, also collected to `fs_StatInference`), unless the analysis config
 sets `store:`. The non-resonant HH models are fetched into `cws/cws/models/multih_models` on first
 use. Only local running is set up: HTCondor submission of CWS tasks is not wired into FLAF yet.
