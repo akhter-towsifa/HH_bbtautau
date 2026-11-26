@@ -262,13 +262,15 @@ StatInference:
 ```
 
 `CI_card_nonres.yaml` has the structure of the analysis card (no model parameters,
-`ggF_DNN_HH`, the same channels, and the resolved categories `res1b` and `res2b`) on the
-processes of the CI physics model
+`ggF_DNN_HH`, the same channels) on the processes of the CI physics model
 (`TestModel`: `custom_CI_Signal`, `custom_CI_Background_TT`, `custom_CI_Background_DY`),
 with one bin per channel and category (`hist_bins: [ 0.0, 1.0 ]`) and the luminosity
-uncertainties only. Its eras are the ones the integration pipeline runs. `boosted` is left
-out: it needs an AK8 fat jet, which the CI samples at `--test 1000` do not give, so its
-Asimov data (the sum of the backgrounds) is empty and the datacard step would fail.
+uncertainties only. Its eras are the ones the integration pipeline runs.
+
+It reads the `res2b` category only. At `--test 1000` the CI backgrounds leave the Asimov data
+(their sum) of the other categories empty or negative in some channel and era -- `boosted`
+needs an AK8 fat jet, and `tauTau/res1b` came out at 0 or, from DY's negative weights,
+below 0 -- and the datacard step refuses such a histogram.
 
 The full pipeline -- histograms, plots, datacards and limits -- is
 `StatInference.law.tasks.NonResonantLimitsAndHistPlotTask`, which requires

@@ -1,8 +1,8 @@
 # The CI card (CI in ci_custom.yaml): the non-resonant card's structure on the CI sample set,
 # so the integration pipeline runs histograms -> datacards -> limits.
 #
-# Same model, discriminant and channels as ../hh_bbtautau_run3_nonres.yaml, and its resolved
-# categories, but the processes of the CI physics model (TestModel in config/phys_models.yaml)
+# Same model, discriminant and channels as ../hh_bbtautau_run3_nonres.yaml, and its res2b
+# category, but the processes of the CI physics model (TestModel in config/phys_models.yaml)
 # and one bin per channel and category: at --test statistics anything finer is empty or
 # negative.
 analysis: hh_bbtautau
@@ -21,13 +21,13 @@ channels:
   - eTau
   - muTau
   - tauTau
-# No boosted: it needs an AK8 fat jet, which the CI samples at --test 1000 do not give, so
-# its Asimov data (the sum of the backgrounds) comes out empty and the datacard step fails.
+# res2b only. At --test 1000 the CI backgrounds leave the Asimov data (their sum) of the
+# other categories empty or negative in some channel and era -- boosted needs an AK8 fat jet,
+# and tauTau/res1b came out at 0 (2023, 2023BPix) or -2.8 (2022EE, from DY's negative
+# weights) -- and the datacard step refuses such a histogram.
 categories:
-  - res1b
   - res2b
 input_categories:
-  res1b: OS_Iso/res1b
   res2b: OS_Iso/res2b
 # one bin over the whole DNN score range
 hist_bins: [ 0.0, 1.0 ]
