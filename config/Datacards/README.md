@@ -124,8 +124,9 @@ Datacards/hh_bbtautau_run3_nonres/combined/datacard_combined.txt
 ```
 
 `limits.json` holds, for each era and for `combined`, the expected limits at the 2.5, 16,
-50, 84 and 97.5% quantiles (and `observed` when unblinded). The task fails if combine
-leaves any of them out.
+50, 84 and 97.5% quantiles (and `observed` when unblinded). A quantile combine did not
+compute -- a fit it could not finish -- is `null`, with a warning, as dhi leaves it NaN;
+the task fails only when combine fails or writes no limit at all.
 
 ### Running `create_datacards.py` by hand
 
@@ -271,6 +272,13 @@ It reads the `res2b` category only. At `--test 1000` the CI backgrounds leave th
 (their sum) of the other categories empty or negative in some channel and era -- `boosted`
 needs an AK8 fat jet, and `tauTau/res1b` came out at 0 or, from DY's negative weights,
 below 0 -- and the datacard step refuses such a histogram.
+
+Even `res2b` can hold no CI background event in some channel and era (`tauTau/res2b` in
+Run3_2023 and Run3_2023BPix), so `data_obs` carries `allow_zero_integral: true`: the CI runs
+the whole pipeline over every era and channel, and its limit is not meant to be meaningful.
+For the same reason the CI card sets `allow_no_background: true`, which makes
+`NonResonantLimitsTask` run `text2workspace.py` with `--X-allow-no-background`: combine refuses
+a bin without background otherwise. The analysis cards leave it unset.
 
 The full pipeline -- histograms, plots, datacards and limits -- is
 `StatInference.law.tasks.NonResonantLimitsAndHistPlotTask`, which requires

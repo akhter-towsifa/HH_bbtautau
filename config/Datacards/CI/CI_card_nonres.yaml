@@ -33,10 +33,19 @@ input_categories:
 hist_bins: [ 0.0, 1.0 ]
 signalFractionForRelevantBins: 0.2
 keep_all_signal_hypothesis_into_single_datacard: true
+# The limit step (NonResonantLimitsTask) passes text2workspace --X-allow-no-background: a
+# channel x category whose Asimov data is empty (see data_obs below) has no background, which
+# combine refuses otherwise.
+allow_no_background: true
 processes:
+  # The Asimov data is the sum of the backgrounds, which at --test 1000 can be empty in a
+  # channel x category of some era (tauTau/res2b in Run3_2023 and Run3_2023BPix: no CI
+  # background event passes there). Accepted rather than dropping the era or channel: the CI
+  # runs the whole pipeline over every era, and its limit is not meant to be meaningful.
   - process: data_obs
     is_data: true
     is_asimov_data: true
+    allow_zero_integral: true
   # the CI signal sample (GluGlutoHHto2B2Tau kl=0); may be empty in a category at --test
   # statistics, and the category is then left without signal
   - process: custom_CI_Signal
